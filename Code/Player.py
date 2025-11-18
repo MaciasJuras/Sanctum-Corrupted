@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite, Character):
 
         for state, files in file_structure.items():
             for file_name in files:
-                full_path = join('..','Assets', 'Images', 'Player', state, file_name)
+                full_path = join('..', 'Assets', 'Images', 'Player', state, file_name)
                 surf = pygame.image.load(full_path).convert_alpha()
                 width = int(surf.get_width() * self.scale_factor)
                 height = int(surf.get_height() * self.scale_factor)

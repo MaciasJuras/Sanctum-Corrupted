@@ -1,6 +1,6 @@
 import random
 
-import Character
+from Code.Character import Character
 from Code.Cards import Card
 
 class Enemy(Character):
