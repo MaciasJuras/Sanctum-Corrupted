@@ -42,7 +42,7 @@ class Character(ABC):
         print(f"[{self.name}] drew {card.name}.")
 
     def play_card(self, card: Card, target):
-        #card.play(self, target)            ???
+        card.play(self, [self, target])
         self.hand.remove(card)
         self.discard_pile.append(card)
 
