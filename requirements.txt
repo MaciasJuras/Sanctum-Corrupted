@@ -1,2 +1,4 @@
 pygame-ce
 tensorflow
+pytmx>=3.32
+pytmx_ng>=3.35
