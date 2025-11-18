@@ -145,3 +145,37 @@ class BattleRage(Card):
             card.add_modifier(damage_boost)
 
 
+class ShieldUp(Card):
+    def get_base_cost(self, tier: int) -> int:
+        if tier >= 2:
+            return 1
+        return 2
+
+    def get_name(self, tier: int) -> str:
+        if tier == 0:
+            return "Shield Up"
+        elif tier == 1:
+            return "Shield Wall"
+        return f"Shield Up +{tier}"
+
+    def effect(self, game_state, tier: int):
+        base_defense = 3
+        defend = base_defense + (tier * 3)
+        game_state.protect(defend)
+
+""" // intended implementation - at least what I had in mind
+CARD_REGISTRY: Dict[int, type] = {
+    1: Strike,
+    2: ShieldUp,
+}
+
+
+def create_card(card_id: int, tier: int = 0) -> Card:
+    card_class = CARD_REGISTRY[card_id]
+    return card_class(card_id, tier)
+
+
+def get_random_card_ids(n: int) -> List[int]:
+    pool = list(CARD_REGISTRY.keys())
+    return random.sample(pool, min(n, len(pool)))
+"""
