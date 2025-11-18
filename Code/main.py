@@ -5,7 +5,6 @@ from Code.Map import generate_rooms, load_room, draw_minimap
 from Code.Room_transition import *
 import pygame
 
-
 if __name__ == "__main__":
     pygame.init()
     display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))

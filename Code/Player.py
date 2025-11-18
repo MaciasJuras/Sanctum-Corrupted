@@ -1,6 +1,6 @@
 from Code.Settings import *
-from Character import Character
-from Card.Card import Card
+import Character
+from Code.Cards import Card
 
 
 class Player(pygame.sprite.Sprite, Character):
@@ -84,13 +84,15 @@ class Player(pygame.sprite.Sprite, Character):
         self.move(dt)
         self.animate(dt)
 
+
+
     def start_turn(self):
         print(f"\n--- {self.name}'s Turn ---")
         self.draw_cards(self.max_cards - len(self.hand))
         self.show_hand()
 
     def show_hand(self):
-        # Prints the player's current hand to the console for now - need to be changed when we will have assets
+
         print(f"{self.name}'s Hand:")
         if not self.hand:
             print("  (No cards in hand)")
@@ -100,7 +102,7 @@ class Player(pygame.sprite.Sprite, Character):
             print(f"  {i + 1}: {card.name} (Cost: {card.cost}) - {card.description}")
 
     def choose_card_to_play(self, target: Character):
-        # Uses console input for now - need to be changed when we will have assets
+
         playable_cards = [card for card in self.hand if card.cost <= self.mana]
         if not playable_cards:
             print("You don't have enough mana to play any card. Your turn ends")
@@ -113,12 +115,11 @@ class Player(pygame.sprite.Sprite, Character):
                     print(f"{self.name} ends their turn.")
                     return False
 
-                chosen_index = int(choice) - 1
 
                 if 0 <= chosen_index < len(self.hand):
                     chosen_card = self.hand[chosen_index]
 
-                    if chosen_card.cost > self.mana:
+
                         print(f"Not enough mana to play {chosen_card}")
                         continue
 
@@ -134,4 +135,4 @@ class Player(pygame.sprite.Sprite, Character):
 
     def end_battle(self):
         self.mana = self.max_mana
-        # add getting reward at the end of won battle
+
