@@ -1,4 +1,4 @@
-from Player import Player
+from Code.Player import Player
 from Code.Settings import *
 from Code.Graphics.Groups import AllSprites
 from Code.Map import generate_rooms, load_room, draw_minimap
