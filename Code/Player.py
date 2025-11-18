@@ -1,6 +1,5 @@
-"""
-from . import Character
-from . import Card
+import Character
+from Code.Cards import Card
 
 class Player(Character):
 
@@ -62,4 +61,3 @@ class Player(Character):
     def end_battle(self):
         self.mana = self.max_mana
         #add getting reward at the end of won battle
-"""

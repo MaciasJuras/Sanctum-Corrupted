@@ -1,8 +1,7 @@
-"""
 import random
 
-from . import Character
-from . import Card
+import Character
+from Code.Cards import Card
 
 class Enemy(Character):
         #The Enemy class, inheriting all logic from Character and adding its own AI logic for choosing cards.
@@ -27,4 +26,3 @@ class Enemy(Character):
         self.mana -= chosen_card.cost
         self.play_card(chosen_card, target)
         return True
-"""

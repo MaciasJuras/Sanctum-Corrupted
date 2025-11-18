@@ -1,9 +1,7 @@
-"""
 import random
 from abc import ABC, abstractmethod
 
-#change the class name or location if needed
-from . import Card
+from Code.Cards import Card
 
 class Character(ABC):
 
@@ -43,8 +41,8 @@ class Character(ABC):
         self.hand.append(card)
         print(f"[{self.name}] drew {card.name}.")
 
-    def play_card(self, card: Card, target)
-        card.play(self, target)
+    def play_card(self, card: Card, target):
+        #card.play(self, target)            ???
         self.hand.remove(card)
         self.discard_pile.append(card)
 
@@ -74,4 +72,3 @@ class Character(ABC):
     @abstractmethod
     def end_battle(self):
         pass
-"""
