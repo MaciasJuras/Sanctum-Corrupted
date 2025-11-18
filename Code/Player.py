@@ -1,5 +1,5 @@
 from Code.Settings import *
-import Character
+from Code.Character import Character
 from Code.Cards import Card
 
 
@@ -102,34 +102,29 @@ class Player(pygame.sprite.Sprite, Character):
             print(f"  {i + 1}: {card.name} (Cost: {card.cost}) - {card.description}")
 
     def choose_card_to_play(self, target: Character):
-
+        #Uses console input for now - need to be changed when we will have assets
         playable_cards = [card for card in self.hand if card.cost <= self.mana]
         if not playable_cards:
             print("You don't have enough mana to play any card. Your turn ends")
             return False
-
         while True:
             try:
                 choice = input(f"Choose a card from the hand (1-indexed) or '0' to end turn: ")
                 if choice == '0':
                     print(f"{self.name} ends their turn.")
                     return False
-
-
+                chosen_index = int(choice)-1
                 if 0 <= chosen_index < len(self.hand):
                     chosen_card = self.hand[chosen_index]
-
-
+                    if  chosen_card.cost > self.mana:
                         print(f"Not enough mana to play {chosen_card}")
                         continue
-
                     self.mana -= chosen_card.cost
                     print(f"{self.name} spends {chosen_card.cost} mana. ({self.mana} remaining)")
                     self.play_card(chosen_card, target)
                     return True
                 else:
                     print("Invalid choice. Please pick a number from your hand.")
-
             except ValueError:
                 print("Invalid input. Please enter a number.")
 
