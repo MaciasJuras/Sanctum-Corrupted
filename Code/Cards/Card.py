@@ -12,9 +12,15 @@ class EffectTiming(Enum):
     PERMANENT = "permanent"
 
 
+class School(Enum):
+    """Card school types"""
+    NORMAL = "normal"
+    MAGICAL = "magical"
+    TECHNICAL = "technical"
+
+
 class CardModifier:
     """Represents a temporary effect on a card"""
-
     def __init__(self,
                  cost_change: int = 0,
                  damage_multiplier: float = 1.0,
@@ -27,9 +33,10 @@ class CardModifier:
 
 
 class Card(ABC):
-    def __init__(self, card_id: int, tier: int = 0):
+    def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         self.card_id = card_id
         self.tier = tier
+        self.school = school
         self.base_mana_cost = self.get_base_cost(tier)
         self.name = self.get_name(tier)
         self.modifiers: List[CardModifier] = []  # Temporary effects
@@ -76,106 +83,3 @@ class Card(ABC):
         self.tier += 1
         self.base_mana_cost = self.get_base_cost(self.tier)
         self.name = self.get_name(self.tier)
-
-
-class Strike(Card):
-    def get_base_cost(self, tier: int) -> int:
-        if tier >= 2:
-            return 1
-        return 2
-
-    def get_name(self, tier: int) -> str:
-        if tier == 0:
-            return "Strike"
-        elif tier == 1:
-            return "Precise Strike"
-        elif tier == 2:
-            return "Overwhelming Strike"
-        return f"Strike +{tier}"
-
-    def effect(self, game_state, tier: int):
-        base_damage = 3
-        damage = base_damage + (tier * 3)
-
-        # Apply damage modifiers
-        for modifier in self.modifiers:
-            damage = int(damage * modifier.damage_multiplier)
-
-        game_state.deal_damage(damage)
-
-
-class DrawAndDiscount(Card):
-
-    def get_base_cost(self, tier: int) -> int:
-        return 1
-
-    def get_name(self, tier: int) -> str:
-        return "Bargain Hunter"
-
-    def effect(self, game_state, tier: int):
-        num_cards = 3 + tier
-        drawn_cards = game_state.draw_cards(num_cards)
-
-        discount_modifier = CardModifier(
-            cost_change=-2,
-            timing=EffectTiming.UNTIL_PLAYED,
-            description="Costs 2 less (until played)"
-        )
-
-        for card in drawn_cards:
-            card.add_modifier(discount_modifier)
-
-
-class BattleRage(Card):
-
-    def get_base_cost(self, tier: int) -> int:
-        return 1
-
-    def get_name(self, tier: int) -> str:
-        return "Battle Rage"
-
-    def effect(self, game_state, tier: int):
-        damage_boost = CardModifier(
-            damage_multiplier=1.5 + (tier * 0.25),
-            timing=EffectTiming.END_OF_TURN,
-            description="+50% damage this turn"
-        )
-
-        for card in game_state.player.hand:
-            card.add_modifier(damage_boost)
-
-
-class ShieldUp(Card):
-    def get_base_cost(self, tier: int) -> int:
-        if tier >= 2:
-            return 1
-        return 2
-
-    def get_name(self, tier: int) -> str:
-        if tier == 0:
-            return "Shield Up"
-        elif tier == 1:
-            return "Shield Wall"
-        return f"Shield Up +{tier}"
-
-    def effect(self, game_state, tier: int):
-        base_defense = 3
-        defend = base_defense + (tier * 3)
-        game_state.protect(defend)
-
-""" // intended implementation - at least what I had in mind
-CARD_REGISTRY: Dict[int, type] = {
-    1: Strike,
-    2: ShieldUp,
-}
-
-
-def create_card(card_id: int, tier: int = 0) -> Card:
-    card_class = CARD_REGISTRY[card_id]
-    return card_class(card_id, tier)
-
-
-def get_random_card_ids(n: int) -> List[int]:
-    pool = list(CARD_REGISTRY.keys())
-    return random.sample(pool, min(n, len(pool)))
-"""
