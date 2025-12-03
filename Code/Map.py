@@ -101,19 +101,19 @@ def load_room(position, room_cls, all_sprites, collision_sprites, door_sprites, 
         ground_layer = tmx_map.get_layer_by_name('Ground')
         for x, y, image in ground_layer.tiles():
             if image:
-                Sprite((x * TILE_SIZE + offset_x, y * TILE_SIZE + offset_y), image, [all_sprites])
+                Sprite((x * TILE_SIZE + offset_x, y * TILE_SIZE + offset_y), image, (all_sprites, ))
 
         walls_layer = tmx_map.get_layer_by_name('Walls')
         for x, y, image in walls_layer.tiles():
             if image:
-               Sprite((x * TILE_SIZE + offset_x, y * TILE_SIZE + offset_y), image, [all_sprites])
+               Sprite((x * TILE_SIZE + offset_x, y * TILE_SIZE + offset_y), image, (all_sprites, ))
 
         for obj in tmx_map.get_layer_by_name("Collisions"):
             collision_surface = pygame.Surface((obj.width, obj.height))
             CollisionSprite(
                 (obj.x + offset_x, obj.y + offset_y),
                 collision_surface,
-                [collision_sprites]
+                (collision_sprites, )
             )
 
         room = room_cls(position, (offset_x, offset_y), room_width, room_height)
@@ -138,6 +138,6 @@ def create_doors(room, door_sprites):
     for direction_vec, (name, x, y) in directions.items():
         size = (door_width, door_height)
 
-        door = Door((x, y), size, direction_vec, [door_sprites])
+        door = Door((x, y), size, direction_vec, (door_sprites, ))
         door.room = room.position
         door.name = name

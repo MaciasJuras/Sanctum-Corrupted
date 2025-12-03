@@ -1,12 +1,11 @@
 import random
 from abc import ABC, abstractmethod
 
-from Code.Cards import Card
+from Code.Cards.Card import Card
 
 class Character(ABC):
 
     #An abstract base class for any combatant in the game.
-    #It cannot be used on its own and must be inherited by a subclass like Player or Enemy.
 
     def __init__(self, name, health, full_deck: list[Card]):
         self.name = name

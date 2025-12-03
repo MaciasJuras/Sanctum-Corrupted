@@ -1,7 +1,7 @@
 import random
 
 from Code.Character import Character
-from Code.Cards import Card
+from Code.Cards.Card import Card
 
 class Enemy(Character):
         #The Enemy class, inheriting all logic from Character and adding its own AI logic for choosing cards.
