@@ -1,6 +1,6 @@
 from Code.Settings import *
 from Code.Character import Character
-from Code.Cards import Card
+from Code.Cards.Card import Card
 
 
 class Player(pygame.sprite.Sprite, Character):
@@ -9,6 +9,7 @@ class Player(pygame.sprite.Sprite, Character):
         pygame.sprite.Sprite.__init__(self, groups)
         Character.__init__(self, name, health, full_deck if full_deck else [])
 
+        self.frames = {'Left': [], 'Right': [], 'Up': [], 'Down': []}
         self.scale_factor = 0.8
         self.load_images()
         self.state, self.frame_index = 'Down', 0
@@ -25,7 +26,6 @@ class Player(pygame.sprite.Sprite, Character):
         self.in_battle = False
 
     def load_images(self):
-        self.frames = {'Left': [], 'Right': [], 'Up': [], 'Down': []}
 
         file_structure = {
             'Down': ['0.png', '1.png', '2.png'],
@@ -84,8 +84,6 @@ class Player(pygame.sprite.Sprite, Character):
         self.move(dt)
         self.animate(dt)
 
-
-
     def start_turn(self):
         print(f"\n--- {self.name}'s Turn ---")
         self.draw_cards(self.max_cards - len(self.hand))
@@ -99,11 +97,11 @@ class Player(pygame.sprite.Sprite, Character):
             return
 
         for i, card in enumerate(self.hand):
-            print(f"  {i + 1}: {card.name} (Cost: {card.cost}) - {card.description}")
+            print(f"  {i + 1}: {card.name} (Cost: {card.mana_cost})")
 
     def choose_card_to_play(self, target: Character):
         #Uses console input for now - need to be changed when we will have assets
-        playable_cards = [card for card in self.hand if card.cost <= self.mana]
+        playable_cards = [card for card in self.hand if card.mana_cost <= self.mana]
         if not playable_cards:
             print("You don't have enough mana to play any card. Your turn ends")
             return False
@@ -116,11 +114,11 @@ class Player(pygame.sprite.Sprite, Character):
                 chosen_index = int(choice)-1
                 if 0 <= chosen_index < len(self.hand):
                     chosen_card = self.hand[chosen_index]
-                    if  chosen_card.cost > self.mana:
-                        print(f"Not enough mana to play {chosen_card}")
+                    if  chosen_card.mana_cost > self.mana:
+                        print(f"Not enough mana to play {chosen_card.name}")
                         continue
-                    self.mana -= chosen_card.cost
-                    print(f"{self.name} spends {chosen_card.cost} mana. ({self.mana} remaining)")
+                    self.mana -= chosen_card.mana_cost
+                    print(f"{self.name} spends {chosen_card.mana_cost} mana. ({self.mana} remaining)")
                     self.play_card(chosen_card, target)
                     return True
                 else:
