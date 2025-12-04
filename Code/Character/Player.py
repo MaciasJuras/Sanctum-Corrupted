@@ -1,5 +1,5 @@
 from Code.Settings import *
-from Code.Character import Character
+from Code.Character.Character import Character
 from Code.Cards.Card import Card
 
 

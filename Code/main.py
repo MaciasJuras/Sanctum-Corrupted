@@ -1,8 +1,8 @@
-from Code.Player import Player
+from Code.Character.Player import Player
 from Code.Settings import *
 from Code.Graphics.Groups import AllSprites
-from Code.Map import generate_rooms, load_room, draw_minimap
-from Code.Room_transition import *
+from Code.Map.Map import generate_rooms, load_room, draw_minimap
+from Code.Map.Room_transition import *
 import pygame
 
 """ #function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
