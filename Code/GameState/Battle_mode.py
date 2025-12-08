@@ -17,31 +17,8 @@ def handle_enemy_interaction(enemy_sprites, player):
 
 
 def start_battle_mode(player, enemy):
-    """ Executes the transition to battle mode by repositioning sprites
-    to the center of the screen."""
-
-    # 1. Calculate the center points for the battle screen view
-    # battle_center_x = WINDOW_WIDTH // 2
-    # battle_center_y = WINDOW_HEIGHT // 2
-    #
-    # # 2. Reposition the Player and Enemy to designated combat spots
-    # # These positions are absolute screen coordinates, not world coordinates.
-    # # Player is moved slightly left of center
-    # player.rect.center = (battle_center_x - 150, battle_center_y)
-    # player.position.xy = player.rect.topleft  # Update position vector
-    #
-    # # Enemy is moved slightly right of center
-    # enemy.rect.center = (battle_center_x + 150, battle_center_y)
-    # enemy.position.xy = enemy.rect.topleft  # Update position vector
-
-    print(f"BATTLE COMMENCED: {player.name} vs. {enemy.name}!")
-
-    # 3. Initialization (You would add your Battle Manager instantiation here)
-    # E.g., self.battle_manager = BattleManager(player, enemy)
-
-    # NOTE: You will need logic in your main loop to handle the world offset/camera
-    # when player.in_battle is True, ensuring the battle scene stays fixed on screen.
-
+    """ Executes the transition to battle mode."""
+    print(f"BATTLE COMMENCED: {player.name} vs. {enemy.name}!") #black screen defined in main for nor
 
 def handle_battle_exit(player, e_pressed_last_frame):
     keys = pygame.key.get_pressed()
