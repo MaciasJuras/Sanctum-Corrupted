@@ -22,7 +22,23 @@ class ShieldUp(Card):
         else:  # TECHNICAL
             names = {0: "Deploy Shield", 1: "Energy Barrier", 2: "Force Field"}
         return names.get(tier, f"Shield Up +{tier}")
-    
+
+    def get_path(self) -> str:
+        if self.school == School.NORMAL:
+            path = "../../../Assets/Images/Cards/Defense/card-block-{self.school.value}.png"
+        elif self.school == School.MAGICAL:
+            path = "../../../Assets/Images/Cards/Defense/card-block-{self.school.value}.png"
+        else:  # TECHNICAL
+            path = "../../../Assets/Images/Cards/Defense/card-block-{self.school.value}.png"
+        return path
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            defense = 4 + (tier * 4)
+        else:
+            defense = 3 + (tier * 3)
+        return defense
+
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
             defense = 4 + (tier * 4)
@@ -51,6 +67,18 @@ class Dodge(Card):
         else:  # TECHNICAL
             names = {0: "Sidestep", 1: "Quick Dash", 2: "Burst Movement"}
         return names.get(tier, f"Dodge +{tier}")
+
+    def get_path(self) -> str:
+        if self.school == School.NORMAL:
+            path = "../../../Assets/Images/Cards/Defense/card-dodge-{self.school.value}.png"
+        elif self.school == School.MAGICAL:
+            path = "../../../Assets/Images/Cards/Defense/card-dodge-{self.school.value}.png"
+        else:  # TECHNICAL
+            path = "../../../Assets/Images/Cards/Defense/card-dodge-{self.school.value}.png"
+        return path
+
+    def get_effect_value(self, tier: int) -> int:
+        pass #TODO??
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -79,6 +107,12 @@ class ArmorUp(Card):
         else:  # TECHNICAL
             names = {0: "Plating", 1: "Reinforced Plating", 2: "Reactive Armor"}
         return names.get(tier, f"Armor Up +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -108,6 +142,12 @@ class CounterAttack(Card):
         else:  # TECHNICAL
             names = {0: "Auto-Turret", 1: "Defense System", 2: "Retaliation Protocol"}
         return names.get(tier, f"Counter Attack +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -130,12 +170,24 @@ class Regeneration(Card):
     
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
-            names = {0: "Regeneration", 1: "Fast Healing", 2: "Rapid Recovery"}
+            names = {0: "Bandages", 1: "First Aid", 2: "Full recovery"}
         elif self.school == School.MAGICAL:
-            names = {0: "Healing Aura", 1: "Life Bloom", 2: "Vitality Surge"}
+            names = {0: "Runic Wrap", 1: "Spirit Thread", 2: "Blessed Cloth"}
         else:  # TECHNICAL
-            names = {0: "Med Kit", 1: "Auto-Repair", 2: "Nano Machines"}
+            names = {0: "Med Kit", 1: "Auto-Repair", 2: "Systemic Repair"}
         return names.get(tier, f"Regeneration +{tier}")
+
+    def get_path(self) -> str:
+        if self.school == School.NORMAL:
+            path = "../../../Assets/Images/Cards/Heal/card-bandages-{self.school.value}.png"
+        elif self.school == School.MAGICAL:
+            path = "../../../Assets/Images/Cards/Heal/card-bandages-{self.school.value}.png"
+        else:  # TECHNICAL
+            path = "../../../Assets/Images/Cards/Heal/card-bandages-{self.school.value}.png"
+        return path
+
+    def get_effect_value(self, tier: int) -> int:
+        pass #TODO??
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -161,12 +213,29 @@ class Heal(Card):
     
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
-            names = {0: "Bandage", 1: "First Aid", 2: "Full Recovery"}
+            names = {0: "Health Potion", 1: "Revitalizing Brew", 2: "Panacea"}
         elif self.school == School.MAGICAL:
-            names = {0: "Heal", 1: "Greater Heal", 2: "Divine Intervention"}
+            names = {0: "Healing Charm", 1: "Restorative Brew", 2: "Elixir of Life"}
         else:  # TECHNICAL
-            names = {0: "Stim Pack", 1: "Medical Drone", 2: "Emergency Protocol"}
+            names = {0: "Quick Synth", 1: "Gene Reconstructor", 2: "Emergency Protocol"}
         return names.get(tier, f"Bandage +{tier}")
+
+    def get_path(self) -> str:
+        if self.school == School.NORMAL:
+            path = "../../../Assets/Images/Cards/Heal/card-heal-{self.school.value}.png"
+        elif self.school == School.MAGICAL:
+            path = "../../../Assets/Images/Cards/Heal/card-heal-{self.school.value}.png"
+        else:  # TECHNICAL
+            path = "../../../Assets/Images/Cards/Heal/card-heal-{self.school.value}.png"
+        return path
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            heal = 6 + (tier * 4)
+        else:
+            heal = 5 + (tier * 3)
+
+        return heal
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -196,6 +265,12 @@ class Parry(Card):
         else:  # TECHNICAL
             names = {0: "Deflect", 1: "Active Defense", 2: "Adaptive Shield"}
         return names.get(tier, f"Parry +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:

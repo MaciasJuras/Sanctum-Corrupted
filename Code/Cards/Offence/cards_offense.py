@@ -14,12 +14,28 @@ class Strike(Card):
     
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
-            names = {0: "Strike", 1: "Precise Strike", 2: "Overwhelming Strike"}
+            names = {0: "Strike", 1: "Precise Strike", 2: "Crushing Strike"}
         elif self.school == School.MAGICAL:
             names = {0: "Arcane Bolt", 1: "Arcane Missile", 2: "Arcane Barrage"}
         else:  # TECHNICAL
             names = {0: "Tactical Strike", 1: "Calculated Strike", 2: "Optimized Strike"}
         return names.get(tier, f"Strike +{tier}")
+
+    def get_path(self) -> str:
+        if self.school == School.NORMAL:
+            path = "../../../Assets/Images/Cards/Damage/card-strike-{self.school.value}.png"
+        elif self.school == School.MAGICAL:
+            path = "../../../Assets/Images/Cards/Damage/card-strike-{self.school.value}.png"
+        else:  # TECHNICAL
+            path = "../../../Assets/Images/Cards/Damage/card-strike-{self.school.value}.png"
+        return path
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            damage = 4 + (tier * 4)
+        else:
+            damage = 3 + (tier * 3)
+        return damage
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -51,6 +67,12 @@ class Slash(Card):
         else:  # TECHNICAL
             names = {0: "Precision Cuts", 1: "Precision Flurry", 2: "Precision Storm"}
         return names.get(tier, f"Slash +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         hits = 2 + tier
@@ -86,6 +108,12 @@ class HeavyStrike(Card):
         else:  # TECHNICAL
             names = {0: "Armor Breaker", 1: "Fortress Breaker", 2: "Wall Breaker"}
         return names.get(tier, f"Heavy Strike +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         base_damage = 10 + (tier * 5)
@@ -122,6 +150,12 @@ class Execute(Card):
         else:  # TECHNICAL
             names = {0: "Lethal Strike", 1: "Assassinate", 2: "Death Blow"}
         return names.get(tier, f"Execute +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         base_damage = 5 + (tier * 3)
@@ -160,6 +194,12 @@ class PoisonStrike(Card):
         else:  # TECHNICAL
             names = {0: "Bio Weapon", 1: "Neurotoxin", 2: "Plague Agent"}
         return names.get(tier, f"Poison Strike +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         immediate_damage = 2 + tier
@@ -197,6 +237,12 @@ class AreaAttack(Card):
         else:  # TECHNICAL
             names = {0: "Grenade", 1: "Cluster Bomb", 2: "Carpet Bombing"}
         return names.get(tier, f"Whirlwind +{tier}")
+
+    def get_path(self) -> str:
+        pass
+
+    def get_effect_value(self, tier: int) -> int:
+        pass
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
