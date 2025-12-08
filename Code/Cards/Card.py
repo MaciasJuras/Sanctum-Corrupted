@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from PIL import Image, ImageDraw, ImageFont
 from typing import Dict, List, Callable
 import random
+import os
 from enum import Enum
 
 
@@ -71,6 +73,14 @@ class Card(ABC):
         pass
 
     @abstractmethod
+    def get_path(self) -> str:
+        pass
+
+    @abstractmethod
+    def get_effect_value(self, tier: int) -> int:
+        pass
+
+    @abstractmethod
     def effect(self, game_state, tier: int):
         pass
 
@@ -83,3 +93,52 @@ class Card(ABC):
         self.tier += 1
         self.base_mana_cost = self.get_base_cost(self.tier)
         self.name = self.get_name(self.tier)
+
+    def draw_text_centered(self, draw: ImageDraw.ImageDraw, text: str, center_x: int, center_y: int, font):
+        """Draws text centered on a target (X, Y) point."""
+
+        color = (255, 255, 255, 255)
+
+        left, top, right, bottom = draw.textbbox((0, 0), text, font)
+
+        start_x = center_x - ((right - left) / 2)
+        start_y = center_y - ((bottom - top) / 2)
+
+        draw.text((start_x, start_y), text, font=font, fill=color)
+
+    def generate_card_image(self):
+        """
+        Generates a card image from a Card object instance.
+        """
+        font = 'Jersey10.ttf'
+        template_path = self.get_path()
+
+        if not os.path.exists(template_path):
+            print(f"Error: Template file not found at '{template_path}'.")
+            return
+
+        img = None
+        try:
+            img = Image.open(template_path).convert("RGBA")
+            draw = ImageDraw.Draw(img)
+
+            try:
+                if len(self.get_name(self.tier)) > 13:
+                    name_font = ImageFont.truetype(font, 30)
+                else:
+                    name_font = ImageFont.truetype(font, 36)
+                mana_font = ImageFont.truetype(font, 34)
+                value_font = ImageFont.truetype(font, 34)
+            except IOError:
+                print(f"Warning: Font file '{font}' not found. Using default font.")
+                name_font = ImageFont.load_default()
+                mana_font = ImageFont.load_default()
+                value_font = ImageFont.load_default()
+
+            self.draw_text_centered(draw, str(self.get_base_cost(self.tier)), 30, 30, mana_font)
+            self.draw_text_centered(draw, self.get_name(self.tier), 143, 40, name_font)
+            self.draw_text_centered(draw, str(self.get_effect_value(self.tier)), 246, 313, value_font)
+        except Exception as e:
+            print(f"An unexpected error occurred during image generation: {e}")
+
+        return img
