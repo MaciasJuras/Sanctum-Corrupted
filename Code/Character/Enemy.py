@@ -1,15 +1,22 @@
 import random
+import pygame
 
 from Code.Character.Character import Character
 from Code.Cards.Card import Card
 
-class Enemy(Character):
+class Enemy(pygame.sprite.Sprite, Character):
         #The Enemy class, inheriting all logic from Character and adding its own AI logic for choosing cards.
 
-    def __init__(self, name, health, mana, full_deck: list[Card]):
-        super().__init__(name, health, full_deck)
+    def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
+        pygame.sprite.Sprite.__init__(self, groups)
+        Character.__init__(self, name, health, full_deck if full_deck else [])
         self.mana = mana
         self.max_mana = mana
+        self.image = pygame.Surface((64, 64))  # Placeholder size
+        self.image.fill((100, 100, 100))  # Generic gray placeholder
+
+        self.rect = self.image.get_frect(center=pos)
+        self.position = pygame.math.Vector2(pos)
 
     def start_turn(self):
         print(f"\n--- {self.name}'s Turn ---")
@@ -26,3 +33,21 @@ class Enemy(Character):
         self.mana -= chosen_card.cost
         self.play_card(chosen_card, target)
         return True
+
+    def end_battle(self):
+        pass
+
+class MagicRat(Enemy):
+        def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
+            super().__init__(pos, groups, name, health, mana, full_deck)
+            self.mana = mana
+            image_path = "../Assets/Images/Enemies/magic-rat.png"
+
+            try:
+                self.image = pygame.image.load(image_path).convert_alpha()
+            except pygame.error:
+                # Fallback if image path is bad
+                self.image = pygame.Surface((64, 64))
+                self.image.fill((0, 0, 255))
+
+            self.rect = self.image.get_frect(center=pos)
