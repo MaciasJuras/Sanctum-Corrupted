@@ -94,7 +94,7 @@ def load_room(position, room_cls, all_sprites, collision_sprites, door_sprites, 
     offset_x = position[0] * room_width
     offset_y = position[1] * room_height
 
-    map_path = join('../Assets/Images/Maps', 'Map9.tmx')
+    map_path = join('Assets/Images/Maps', 'Map9.tmx')
     if os.path.exists(map_path):
         tmx_map = load_pygame(map_path)
 

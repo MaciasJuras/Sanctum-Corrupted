@@ -41,7 +41,7 @@ class MagicRat(Enemy):
         def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
             super().__init__(pos, groups, name, health, mana, full_deck)
             self.mana = mana
-            image_path = "../Assets/Images/Enemies/magic-rat.png"
+            image_path = "Assets/Images/Enemies/magic-rat.png"
 
             try:
                 self.image = pygame.image.load(image_path).convert_alpha()
