@@ -7,6 +7,7 @@ from Code.Graphics.Groups import AllSprites
 from Code.Map.Map import generate_rooms, load_room, draw_minimap
 from Code.Map.Room_transition import *
 from Code.GameState.Battle_mode import *
+from Code.Graphics.Battle_graphic import *
 
 """ #function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
 def draw_room_name(display_surface, current_room, rooms, font_size=32):
@@ -49,6 +50,8 @@ if __name__ == "__main__":
     for room_pos in room_positions:
         load_room(room_pos, room_classes[room_pos], all_sprites, collision_sprites, door_sprites, rooms)
 
+    battle_images_cache = {}
+
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
     enemy = MagicRat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, 20, [])
 
@@ -61,8 +64,10 @@ if __name__ == "__main__":
 
         if player.in_battle:
             e_pressed_last_frame = handle_battle_exit(player, e_pressed_last_frame)
+            #if current_room == (0, 0):
+            bg_file = 'Battle1.jpg'
 
-            display_surface.fill('black')
+            draw_battle_background(display_surface, bg_file, battle_images_cache)
         else:
             all_sprites.update(dt)
 
