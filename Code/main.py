@@ -1,4 +1,10 @@
 import pygame
+import sys
+import pathlib
+
+_PROJECT_ROOT = pathlib.Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from Code.Character.Player import Player
 from Code.Character.Enemy import *
@@ -8,6 +14,9 @@ from Code.Map.Map import generate_rooms, load_room, draw_minimap
 from Code.Map.Room_transition import *
 from Code.GameState.Battle_mode import *
 from Code.Graphics.Battle_graphic import *
+
+
+
 
 """ #function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
 def draw_room_name(display_surface, current_room, rooms, font_size=32):

@@ -3,7 +3,7 @@ import os
 
 def draw_battle_background(display_surface, bg_name, image_cache):
     if bg_name not in image_cache:
-        battle_background_path = join('../Assets/Images/Battle', bg_name)
+        battle_background_path = join('Assets/Images/Battle', bg_name)
 
         if os.path.exists(battle_background_path):
             bg_image = pygame.image.load(battle_background_path).convert()
