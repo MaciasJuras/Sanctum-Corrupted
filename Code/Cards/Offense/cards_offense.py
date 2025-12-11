@@ -3,6 +3,12 @@ from ..Card import Card, School, CardModifier, EffectTiming
 
 class Strike(Card):
     """Basic attack card"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -20,6 +26,13 @@ class Strike(Card):
         else:  # TECHNICAL
             names = {0: "Tactical Strike", 1: "Calculated Strike", 2: "Optimized Strike"}
         return names.get(tier, f"Strike +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            damage = 4 + (tier * 4)
+        else:
+            damage = 3 + (tier * 3)
+        return damage
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -29,11 +42,17 @@ class Strike(Card):
         
         for modifier in self.modifiers:
             damage = int(damage * modifier.damage_multiplier)
-        game_state.deal_damage(damage)
+        game_state[1].deal_damage(damage)
 
 
 class Slash(Card):
     """Multiple weak hits"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -51,6 +70,14 @@ class Slash(Card):
         else:  # TECHNICAL
             names = {0: "Precision Cuts", 1: "Precision Flurry", 2: "Precision Storm"}
         return names.get(tier, f"Slash +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        hits = 2 + tier
+        if self.school == School.TECHNICAL:
+            damage_per_hit = 3
+        else:
+            damage_per_hit = 2
+        return hits * damage_per_hit
     
     def effect(self, game_state, tier: int):
         hits = 2 + tier
@@ -64,11 +91,17 @@ class Slash(Card):
             damage = damage_per_hit
             for modifier in self.modifiers:
                 damage = int(damage * modifier.damage_multiplier)
-            game_state.deal_damage(damage)
+            game_state[1].deal_damage(damage)
 
 
 class HeavyStrike(Card):
     """High cost, high damage"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -86,6 +119,12 @@ class HeavyStrike(Card):
         else:  # TECHNICAL
             names = {0: "Armor Breaker", 1: "Fortress Breaker", 2: "Wall Breaker"}
         return names.get(tier, f"Heavy Strike +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        base_damage = 10 + (tier * 5)
+        if self.school == School.TECHNICAL:
+            base_damage += 2
+        return base_damage
     
     def effect(self, game_state, tier: int):
         base_damage = 10 + (tier * 5)
@@ -95,16 +134,22 @@ class HeavyStrike(Card):
             damage = base_damage
             for modifier in self.modifiers:
                 damage = int(damage * modifier.damage_multiplier)
-            game_state.deal_damage(damage, ignore_armor=True)
+            game_state[1].deal_damage(damage, ignore_armor=True)
         else:
             damage = base_damage
             for modifier in self.modifiers:
                 damage = int(damage * modifier.damage_multiplier)
-            game_state.deal_damage(damage)
+            game_state[1].deal_damage(damage)
 
 
 class Execute(Card):
     """Bonus damage to wounded enemies"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -122,10 +167,16 @@ class Execute(Card):
         else:  # TECHNICAL
             names = {0: "Lethal Strike", 1: "Assassinate", 2: "Death Blow"}
         return names.get(tier, f"Execute +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        base_damage = 5 + (tier * 3)
+        if self.school == School.TECHNICAL:
+            base_damage += 1
+        return base_damage
     
     def effect(self, game_state, tier: int):
         base_damage = 5 + (tier * 3)
-        enemy_hp_percent = game_state.get_enemy_hp_percent()
+        enemy_hp_percent = game_state[1].get_hp_percent()
         
         if self.school == School.TECHNICAL:
             threshold = 0.6
@@ -141,11 +192,17 @@ class Execute(Card):
         damage = base_damage
         for modifier in self.modifiers:
             damage = int(damage * modifier.damage_multiplier)
-        game_state.deal_damage(damage)
+        game_state[1].deal_damage(damage)
 
 
 class PoisonStrike(Card):
     """Damage over time"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -160,6 +217,10 @@ class PoisonStrike(Card):
         else:  # TECHNICAL
             names = {0: "Bio Weapon", 1: "Neurotoxin", 2: "Plague Agent"}
         return names.get(tier, f"Poison Strike +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        immediate_damage = 2 + tier
+        return immediate_damage
     
     def effect(self, game_state, tier: int):
         immediate_damage = 2 + tier
@@ -174,12 +235,18 @@ class PoisonStrike(Card):
         damage = immediate_damage
         for modifier in self.modifiers:
             damage = int(damage * modifier.damage_multiplier)
-        game_state.deal_damage(damage)
-        game_state.apply_poison(poison_damage, duration)
+        game_state[1].deal_damage(damage)
+        game_state[1].apply_poison(poison_damage, duration)
 
 
 class AreaAttack(Card):
     """Damage all enemies"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -197,6 +264,13 @@ class AreaAttack(Card):
         else:  # TECHNICAL
             names = {0: "Grenade", 1: "Cluster Bomb", 2: "Carpet Bombing"}
         return names.get(tier, f"Whirlwind +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            damage = 6 + (tier * 3)
+        else:
+            damage = 5 + (tier * 2)
+        return damage
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -206,4 +280,4 @@ class AreaAttack(Card):
         
         for modifier in self.modifiers:
             damage = int(damage * modifier.damage_multiplier)
-        game_state.deal_damage_aoe(damage)
+        game_state[1].deal_damage_aoe(damage)
