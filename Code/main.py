@@ -59,10 +59,13 @@ if __name__ == "__main__":
     for room_pos in room_positions:
         load_room(room_pos, room_classes[room_pos], all_sprites, collision_sprites, door_sprites, rooms)
 
-    battle_images_cache = {}
 
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
     enemy = MagicRat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, 20, [])
+
+    player.get_new_card(0,'MAGICAL')
+    player.get_new_card(0,'NORMAL')
+    battle_initialized = False
 
     while running:
         dt = clock.tick() / 1000
@@ -76,7 +79,18 @@ if __name__ == "__main__":
             #if current_room == (0, 0):
             bg_file = 'Battle1.jpg'
 
-            draw_battle_background(display_surface, bg_file, battle_images_cache)
+            if not battle_initialized:
+                draw_battle_background(display_surface, bg_file)
+
+                player.start_battle()
+                player.start_turn()
+                display_cards_in_hand(player.hand, display_surface)
+
+                battle_initialized = True
+
+            if not player.in_battle:
+                battle_initialized = False
+
         else:
             all_sprites.update(dt)
 

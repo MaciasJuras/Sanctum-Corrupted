@@ -1,6 +1,8 @@
+from Code.Graphics.Battle_graphic import display_cards_in_hand
 from Code.Settings import *
 from Code.Character.Character import Character
 from Code.Cards.Card import Card
+from Code.Graphics import Battle_graphic
 
 
 class Player(pygame.sprite.Sprite, Character):
@@ -87,17 +89,6 @@ class Player(pygame.sprite.Sprite, Character):
     def start_turn(self):
         print(f"\n--- {self.name}'s Turn ---")
         self.draw_cards(self.max_cards - len(self.hand))
-        self.show_hand()
-
-    def show_hand(self):
-
-        print(f"{self.name}'s Hand:")
-        if not self.hand:
-            print("  (No cards in hand)")
-            return
-
-        for i, card in enumerate(self.hand):
-            print(f"  {i + 1}: {card.name} (Cost: {card.mana_cost})")
 
     def choose_card_to_play(self, target: Character):
         #Uses console input for now - need to be changed when we will have assets
@@ -128,4 +119,5 @@ class Player(pygame.sprite.Sprite, Character):
 
     def end_battle(self):
         self.mana = self.max_mana
+        print("Battle ended")
 

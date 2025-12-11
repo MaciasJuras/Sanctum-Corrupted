@@ -1,7 +1,8 @@
 import random
 from abc import ABC, abstractmethod
-
-from Code.Cards.Card import Card
+from Code.Cards.Card import *
+from Code.Cards.card_registry import *
+from Code.Cards.card_ids import *
 
 class Character(ABC):
 
@@ -18,6 +19,11 @@ class Character(ABC):
         self.hand = []
         self.discard_pile = []
         self.max_cards = 10
+
+    def get_new_card(self, tier, school_name):
+        school_enum = School[school_name]
+        card = create_card(get_random_card_ids(1)[0],tier,school_enum)
+        self.full_deck.append(card)
 
     def start_battle(self):
         self.draw_pile = self.full_deck.copy()
@@ -36,9 +42,9 @@ class Character(ABC):
                 self.draw_pile = self.discard_pile.copy()
                 self.discard_pile = []
                 random.shuffle(self.draw_pile)
-        card = self.draw_pile.pop()
-        self.hand.append(card)
-        print(f"[{self.name}] drew {card.name}.")
+            card = self.draw_pile.pop()
+            self.hand.append(card)
+            print(f"[{self.name}] drew {card.name}.")
 
     def play_card(self, card: Card, target):
         card.play(self, [self, target])
