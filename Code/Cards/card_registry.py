@@ -1,17 +1,17 @@
 from typing import Dict, Type, List
 import random
-from Card import Card, School
-from Offense.cards_offense import (
+from Code.Cards.Card import Card, School
+from Code.Cards.Offense.cards_offense import (
     Strike, Slash, HeavyStrike, Execute, PoisonStrike, AreaAttack
 )
-from Defense.cards_defense import (
+from Code.Cards.Defense.cards_defense import (
     ShieldUp, Dodge, ArmorUp, CounterAttack, Regeneration, Heal, Parry
 )
-from Utility.cards_utility import (
+from Code.Cards.Utility.cards_utility import (
     DrawCards, DrawAndDiscount, BattleRage, ManaGain, DiscardForPower,
     Cycle, Duplicate, UpgradeCard, CostReduction, ExhaustForEffect, Scry
 )
-import card_ids as CID
+import Code.Cards.card_ids as CID
 
 # Main registry: ID -> Card Class
 CARD_REGISTRY: Dict[int, Type[Card]] = {
@@ -60,10 +60,10 @@ def create_card(card_id: int, tier: int = 0, school: School = School.NORMAL) -> 
         ValueError: If card_id is not in registry
     
     Example:
-        >>> from card_ids import STRIKE
-        >>> from Card import School
-        >>> strike = create_card(STRIKE, tier=0, school=School.NORMAL)
-        >>> magic_strike = create_card(STRIKE, tier=1, school=School.MAGICAL)
+        from card_ids import STRIKE
+        from Card import School
+        strike = create_card(STRIKE, tier=0, school=School.NORMAL)
+        magic_strike = create_card(STRIKE, tier=1, school=School.MAGICAL)
     """
     if card_id not in CARD_REGISTRY:
         raise ValueError(f"Invalid card ID: {card_id}")
@@ -84,10 +84,10 @@ def get_random_card_ids(n: int, card_type: int = None) -> List[int]:
         List of random card IDs
     
     Example:
-        >>> # Get 3 random offense cards
-        >>> ids = get_random_card_ids(3, card_type=0)
-        >>> # Get 5 random cards from any type
-        >>> ids = get_random_card_ids(5)
+        # Get 3 random offense cards
+        ids = get_random_card_ids(3, card_type=0)
+        # Get 5 random cards from any type
+        ids = get_random_card_ids(5)
     """
     if card_type is not None:
         pool = [id for id in CARD_REGISTRY.keys() if CID.get_card_type(id) == card_type]
@@ -113,6 +113,6 @@ def get_card_ids_by_type(card_type: int) -> List[int]:
         List of card IDs matching the type
     
     Example:
-        >>> offense_ids = get_card_ids_by_type(0)
+        offense_ids = get_card_ids_by_type(0)
     """
     return [id for id in CARD_REGISTRY.keys() if CID.get_card_type(id) == card_type]

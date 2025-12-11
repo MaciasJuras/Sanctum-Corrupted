@@ -44,6 +44,11 @@ class Strike(Card):
             damage = int(damage * modifier.damage_multiplier)
         game_state[1].deal_damage(damage)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
 
 class Slash(Card):
     """Multiple weak hits"""
@@ -93,6 +98,13 @@ class Slash(Card):
                 damage = int(damage * modifier.damage_multiplier)
             game_state[1].deal_damage(damage)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-kick-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-kick-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-kick-technical.png'
+        return ''
+
+
 
 class HeavyStrike(Card):
     """High cost, high damage"""
@@ -140,6 +152,12 @@ class HeavyStrike(Card):
             for modifier in self.modifiers:
                 damage = int(damage * modifier.damage_multiplier)
             game_state[1].deal_damage(damage)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-punch-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-punch-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-punch-technical.png'
+        return ''
 
 
 class Execute(Card):
@@ -194,6 +212,12 @@ class Execute(Card):
             damage = int(damage * modifier.damage_multiplier)
         game_state[1].deal_damage(damage)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class PoisonStrike(Card):
     """Damage over time"""
@@ -238,6 +262,12 @@ class PoisonStrike(Card):
         game_state[1].deal_damage(damage)
         game_state[1].apply_poison(poison_damage, duration)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class AreaAttack(Card):
     """Damage all enemies"""
@@ -281,3 +311,9 @@ class AreaAttack(Card):
         for modifier in self.modifiers:
             damage = int(damage * modifier.damage_multiplier)
         game_state[1].deal_damage_aoe(damage)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''

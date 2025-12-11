@@ -3,12 +3,6 @@ from ..Card import Card, School, CardModifier, EffectTiming
 
 class DrawCards(Card):
     """Simple card draw"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -42,15 +36,15 @@ class DrawCards(Card):
         
         game_state[0].draw_cards(num_cards)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class DrawAndDiscount(Card):
     """Draw cards with cost reduction"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -89,15 +83,14 @@ class DrawAndDiscount(Card):
         for card in drawn_cards:
             card.add_modifier(discount_modifier)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
 
 class BattleRage(Card):
     """Damage boost for hand"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -138,15 +131,15 @@ class BattleRage(Card):
         for card in game_state[0].hand:
             card.add_modifier(damage_boost)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class ManaGain(Card):
     """Gain extra mana"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -177,15 +170,15 @@ class ManaGain(Card):
         
         game_state[0].add_mana(mana)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class DiscardForPower(Card):
     """Discard cards for benefits"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -225,15 +218,15 @@ class DiscardForPower(Card):
         
         game_state[1].deal_damage(damage)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class Cycle(Card):
     """Discard and redraw"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -262,15 +255,15 @@ class Cycle(Card):
             game_state[0].discard_from_hand(num_cards)
             game_state[0].draw_cards(num_cards)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class Duplicate(Card):
     """Copy a card in hand"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -304,15 +297,15 @@ class Duplicate(Card):
         
         game_state[0].duplicate_card(copies)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class UpgradeCard(Card):
     """Upgrade a card in hand"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -346,15 +339,14 @@ class UpgradeCard(Card):
         
         game_state[0].upgrade_card_in_hand(num_upgrades)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
 
 class CostReduction(Card):
     """Reduce cost of cards in hand"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -395,15 +387,15 @@ class CostReduction(Card):
         for card in game_state[0].hand:
             card.add_modifier(cost_modifier)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class ExhaustForEffect(Card):
     """Remove card for powerful effect"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -440,15 +432,15 @@ class ExhaustForEffect(Card):
         game_state[1].deal_damage(damage)
         game_state[0].exhaust_card(self)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''
+
 
 class Scry(Card):
     """Look at and manipulate deck"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -480,3 +472,9 @@ class Scry(Card):
             discard_count = 1 + tier
         
         game_state[0].scry(look_ahead, discard_count)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
+        return ''

@@ -50,10 +50,9 @@ class Card(ABC):
         self.modifiers: List[CardModifier] = []  # Temporary effects
         self.permanent_cost_change = 0  # From events/upgrades
 
-    @property
-    def image_path(self) -> str:
-        """Get image path for current school"""
-        return self.image_paths.get(self.school, '')
+    @abstractmethod
+    def get_image_path(self) -> str:
+        pass
 
     @property
     def mana_cost(self) -> int:
@@ -118,11 +117,16 @@ class Card(ABC):
         Generates a card image from a Card object instance.
         """
         font = 'Jersey10.ttf'
-        template_path = self.image_path
+
+        NAME_FONT_SIZE = 40
+        MANA_FONT_SIZE = 40
+        VALUE_FONT_SIZE = 40
+
+        template_path = self.get_image_path()
 
         if not os.path.exists(template_path):
             print(f"Error: Template file not found at '{template_path}'.")
-            return
+            return None
 
         img = None
         try:
@@ -130,17 +134,25 @@ class Card(ABC):
             draw = ImageDraw.Draw(img)
 
             try:
-                if len(self.get_name(self.tier)) > 13:
-                    name_font = ImageFont.truetype(font, 30)
-                else:
-                    name_font = ImageFont.truetype(font, 36)
-                mana_font = ImageFont.truetype(font, 34)
-                value_font = ImageFont.truetype(font, 34)
+                name_font = ImageFont.truetype(font, NAME_FONT_SIZE)
+                mana_font = ImageFont.truetype(font, MANA_FONT_SIZE)
+                value_font = ImageFont.truetype(font, VALUE_FONT_SIZE)
             except IOError:
-                print(f"Warning: Font file '{font}' not found. Using default font.")
-                name_font = ImageFont.load_default()
-                mana_font = ImageFont.load_default()
-                value_font = ImageFont.load_default()
+                try:
+                    font_name = "arial.ttf"
+                    print(f"Jersey10.ttf not found. Switching to {font_name}")
+                    name_font = ImageFont.truetype(font_name, NAME_FONT_SIZE)
+                    mana_font = ImageFont.truetype(font_name, MANA_FONT_SIZE)
+                    value_font = ImageFont.truetype(font_name, VALUE_FONT_SIZE)
+                except IOError:
+                    print(f"Warning: No fonts found. Using default font.")
+                    name_font = ImageFont.load_default()
+                    mana_font = ImageFont.load_default()
+                    value_font = ImageFont.load_default()
+
+            # Reduce name size slightly if the text is very long
+            if len(self.get_name(self.tier)) > 10:
+                name_font = ImageFont.truetype(font_name, int(NAME_FONT_SIZE * 0.8))
 
             self.draw_text_centered(draw, str(self.get_base_cost(self.tier)), 30, 30, mana_font)
             self.draw_text_centered(draw, self.get_name(self.tier), 143, 40, name_font)
