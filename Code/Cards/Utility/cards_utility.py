@@ -1,8 +1,14 @@
-from Card import Card, School, CardModifier, EffectTiming
+from ..Card import Card, School, CardModifier, EffectTiming
 
 
 class DrawCards(Card):
     """Simple card draw"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -20,6 +26,13 @@ class DrawCards(Card):
         else:  # TECHNICAL
             names = {0: "Scan", 1: "Data Mining", 2: "Full Analysis"}
         return names.get(tier, f"Draw Cards +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            num_cards = 3 + tier
+        else:
+            num_cards = 2 + tier
+        return num_cards
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -27,11 +40,17 @@ class DrawCards(Card):
         else:
             num_cards = 2 + tier
         
-        game_state.draw_cards(num_cards)
+        game_state[0].draw_cards(num_cards)
 
 
 class DrawAndDiscount(Card):
     """Draw cards with cost reduction"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -46,6 +65,10 @@ class DrawAndDiscount(Card):
         else:  # TECHNICAL
             names = {0: "Optimization", 1: "System Override", 2: "Maximum Efficiency"}
         return names.get(tier, f"Bargain Hunter +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        num_cards = 3 + tier
+        return num_cards
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -55,7 +78,7 @@ class DrawAndDiscount(Card):
             num_cards = 3 + tier
             discount = -2
         
-        drawn_cards = game_state.draw_cards(num_cards)
+        drawn_cards = game_state[0].draw_cards(num_cards)
         
         discount_modifier = CardModifier(
             cost_change=discount,
@@ -69,6 +92,12 @@ class DrawAndDiscount(Card):
 
 class BattleRage(Card):
     """Damage boost for hand"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -86,6 +115,13 @@ class BattleRage(Card):
         else:  # TECHNICAL
             names = {0: "Targeting System", 1: "Weapon Calibration", 2: "Overcharge"}
         return names.get(tier, f"Battle Rage +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            multiplier = 1.75 + (tier * 0.25)
+        else:
+            multiplier = 1.5 + (tier * 0.25)
+        return int((multiplier - 1) * 100)
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -99,12 +135,18 @@ class BattleRage(Card):
             description=f"+{int((multiplier-1)*100)}% damage this turn"
         )
         
-        for card in game_state.player.hand:
+        for card in game_state[0].hand:
             card.add_modifier(damage_boost)
 
 
 class ManaGain(Card):
     """Gain extra mana"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -119,6 +161,13 @@ class ManaGain(Card):
         else:  # TECHNICAL
             names = {0: "Energy Cell", 1: "Power Core", 2: "Fusion Reactor"}
         return names.get(tier, f"Mana Gain +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            mana = 3 + tier
+        else:
+            mana = 2 + tier
+        return mana
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -126,11 +175,17 @@ class ManaGain(Card):
         else:
             mana = 2 + tier
         
-        game_state.add_mana(mana)
+        game_state[0].add_mana(mana)
 
 
 class DiscardForPower(Card):
     """Discard cards for benefits"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -148,23 +203,37 @@ class DiscardForPower(Card):
         else:  # TECHNICAL
             names = {0: "Emergency Power", 1: "Core Dump", 2: "System Purge"}
         return names.get(tier, f"Desperate Measures +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        # Returns base damage for 2 discarded cards
+        if self.school == School.TECHNICAL:
+            damage = 5 * 2 + (tier * 3)
+        else:
+            damage = 4 * 2 + (tier * 2)
+        return damage
     
     def effect(self, game_state, tier: int):
         num_to_discard = 2
-        discarded = game_state.discard_from_hand(num_to_discard)
+        discarded = game_state[0].discard_from_hand(num_to_discard)
         
         if self.school == School.TECHNICAL:
             damage = 5 * len(discarded) + (tier * 3)
             block = 3 * len(discarded)
-            game_state.add_block(block)
+            game_state[0].add_block(block)
         else:
             damage = 4 * len(discarded) + (tier * 2)
         
-        game_state.deal_damage(damage)
+        game_state[1].deal_damage(damage)
 
 
 class Cycle(Card):
     """Discard and redraw"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -179,20 +248,29 @@ class Cycle(Card):
         else:  # TECHNICAL
             names = {0: "Reboot", 1: "System Refresh", 2: "Hot Swap"}
         return names.get(tier, f"Cycle +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        return 2 + tier
     
     def effect(self, game_state, tier: int):
         num_cards = 2 + tier
         
         if self.school == School.TECHNICAL:
-            game_state.draw_cards(num_cards)
-            game_state.discard_from_hand(num_cards)
+            game_state[0].draw_cards(num_cards)
+            game_state[0].discard_from_hand(num_cards)
         else:
-            game_state.discard_from_hand(num_cards)
-            game_state.draw_cards(num_cards)
+            game_state[0].discard_from_hand(num_cards)
+            game_state[0].draw_cards(num_cards)
 
 
 class Duplicate(Card):
     """Copy a card in hand"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -210,6 +288,13 @@ class Duplicate(Card):
         else:  # TECHNICAL
             names = {0: "Clone", 1: "Replicate", 2: "Mass Production"}
         return names.get(tier, f"Duplicate +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            copies = 2 + tier
+        else:
+            copies = 1 + tier
+        return copies
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -217,11 +302,17 @@ class Duplicate(Card):
         else:
             copies = 1 + tier
         
-        game_state.duplicate_card(copies)
+        game_state[0].duplicate_card(copies)
 
 
 class UpgradeCard(Card):
     """Upgrade a card in hand"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -239,6 +330,13 @@ class UpgradeCard(Card):
         else:  # TECHNICAL
             names = {0: "Upgrade", 1: "Modify", 2: "Optimize"}
         return names.get(tier, f"Hone +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            num_upgrades = 2 + tier
+        else:
+            num_upgrades = 1 + tier
+        return num_upgrades
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -246,11 +344,17 @@ class UpgradeCard(Card):
         else:
             num_upgrades = 1 + tier
         
-        game_state.upgrade_card_in_hand(num_upgrades)
+        game_state[0].upgrade_card_in_hand(num_upgrades)
 
 
 class CostReduction(Card):
     """Reduce cost of cards in hand"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -268,6 +372,13 @@ class CostReduction(Card):
         else:  # TECHNICAL
             names = {0: "Efficiency Mode", 1: "Turbo Boost", 2: "Overclock"}
         return names.get(tier, f"Quick Thinking +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            cost_reduction = 2 + tier
+        else:
+            cost_reduction = 1 + tier
+        return cost_reduction
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -281,12 +392,18 @@ class CostReduction(Card):
             description=f"Costs {abs(cost_reduction)} less this turn"
         )
         
-        for card in game_state.player.hand:
+        for card in game_state[0].hand:
             card.add_modifier(cost_modifier)
 
 
 class ExhaustForEffect(Card):
     """Remove card for powerful effect"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -304,21 +421,34 @@ class ExhaustForEffect(Card):
         else:  # TECHNICAL
             names = {0: "Self Destruct", 1: "Overload", 2: "Meltdown"}
         return names.get(tier, f"Last Resort +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            damage = 8 + (tier * 5)
+        else:
+            damage = 6 + (tier * 4)
+        return damage
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
             damage = 8 + (tier * 5)
             block = 4 + (tier * 3)
-            game_state.add_block(block)
+            game_state[0].add_block(block)
         else:
             damage = 6 + (tier * 4)
         
-        game_state.deal_damage(damage)
-        game_state.exhaust_card(self)
+        game_state[1].deal_damage(damage)
+        game_state[0].exhaust_card(self)
 
 
 class Scry(Card):
     """Look at and manipulate deck"""
+    image_paths = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -333,6 +463,13 @@ class Scry(Card):
         else:  # TECHNICAL
             names = {0: "Deck Analysis", 1: "Deep Scan", 2: "Probability Engine"}
         return names.get(tier, f"Scout Ahead +{tier}")
+
+    def get_effect_value(self, tier: int) -> int:
+        if self.school == School.TECHNICAL:
+            look_ahead = 4 + tier
+        else:
+            look_ahead = 3 + tier
+        return look_ahead
     
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
@@ -342,4 +479,4 @@ class Scry(Card):
             look_ahead = 3 + tier
             discard_count = 1 + tier
         
-        game_state.scry(look_ahead, discard_count)
+        game_state[0].scry(look_ahead, discard_count)

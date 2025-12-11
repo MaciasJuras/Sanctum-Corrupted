@@ -35,6 +35,12 @@ class CardModifier:
 
 
 class Card(ABC):
+    image_paths: Dict[School, str] = {
+        School.NORMAL: '',
+        School.MAGICAL: '',
+        School.TECHNICAL: '',
+    }
+    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         self.card_id = card_id
         self.tier = tier
@@ -43,6 +49,11 @@ class Card(ABC):
         self.name = self.get_name(tier)
         self.modifiers: List[CardModifier] = []  # Temporary effects
         self.permanent_cost_change = 0  # From events/upgrades
+
+    @property
+    def image_path(self) -> str:
+        """Get image path for current school"""
+        return self.image_paths.get(self.school, '')
 
     @property
     def mana_cost(self) -> int:
@@ -70,10 +81,6 @@ class Card(ABC):
 
     @abstractmethod
     def get_name(self, tier: int) -> str:
-        pass
-
-    @abstractmethod
-    def get_path(self) -> str:
         pass
 
     @abstractmethod
@@ -111,7 +118,7 @@ class Card(ABC):
         Generates a card image from a Card object instance.
         """
         font = 'Jersey10.ttf'
-        template_path = self.get_path()
+        template_path = self.image_path
 
         if not os.path.exists(template_path):
             print(f"Error: Template file not found at '{template_path}'.")
