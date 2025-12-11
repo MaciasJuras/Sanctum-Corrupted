@@ -44,6 +44,12 @@ class ShieldUp(Card):
         
         game_state[0].add_block(defense)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Defense/card-block-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Defense/card-block-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Defense/card-block-technical.png'
+        return ''
+
 
 class Dodge(Card):
     """Avoid next attack"""
@@ -80,6 +86,12 @@ class Dodge(Card):
             game_state[0].add_block(2 + tier)
         else:
             game_state[0].add_dodge(1 + tier)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Defense/card-dodge-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Defense/card-dodge-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Defense/card-dodge-technical.png'
+        return ''
 
 
 class ArmorUp(Card):
@@ -122,6 +134,12 @@ class ArmorUp(Card):
             armor = 1 + (tier * 1)
         
         game_state[0].add_armor(armor)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Defense/card-block-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Defense/card-block-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Defense/card-block-technical.png'
+        return ''
 
 
 class CounterAttack(Card):
@@ -167,6 +185,12 @@ class CounterAttack(Card):
         
         game_state[0].add_thorns(damage, stacks)
 
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Defense/card-block-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Defense/card-block-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Defense/card-block-technical.png'
+        return ''
+
 
 class Regeneration(Card):
     """Heal over time"""
@@ -207,6 +231,12 @@ class Regeneration(Card):
             duration = 3
         
         game_state[0].add_regeneration(heal_per_turn, duration)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Heal/card-bandages-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Heal/card-bandages-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Heal/card-bandages-technical.png'
+        return ''
 
 
 class Heal(Card):
@@ -250,6 +280,12 @@ class Heal(Card):
             heal = 5 + (tier * 3)
         
         game_state[0].heal(heal)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Heal/card-heal-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Heal/card-heal-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Heal/card-heal-technical.png'
+        return ''
 
 
 class Parry(Card):
@@ -295,3 +331,9 @@ class Parry(Card):
         
         game_state[0].add_block(block)
         game_state[0].add_next_attack_counter(damage)
+
+    def get_image_path(self) -> str:
+        if self.school == School.NORMAL: return 'Assets/Images/Cards/Defense/card-block-normal.png'
+        if self.school == School.MAGICAL: return 'Assets/Images/Cards/Defense/card-block-magical.png'
+        if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Defense/card-block-technical.png'
+        return ''

@@ -27,5 +27,6 @@ def handle_battle_exit(player, e_pressed_last_frame):
     if e_pressed and not e_pressed_last_frame:
         print("Exiting battle mode!")
         player.in_battle = False
+        player.end_battle()
 
     return e_pressed
