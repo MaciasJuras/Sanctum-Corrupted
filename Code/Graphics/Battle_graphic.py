@@ -8,6 +8,9 @@ TARGET_CARD_WIDTH = 120
 CARD_SPACING = -10
 CARD_SPACE_FROM_BOTTOM_SCREEN = 0.5
 
+PLAYER_PHASE_DELAY = 5000 # 5 seconds
+ENEMY_PHASE_DELAY = 5000  # 5 seconds
+
 def draw_battle_background(display_surface, bg_name):
     battle_background_path = join('Assets/Images/Battle', bg_name)
 
@@ -63,8 +66,8 @@ def update_battle_sequence(player, enemy, display_surface):
     # Positions of cards in a center
     estimated_card_height = int(TARGET_CARD_WIDTH * 1.4)
     center_y = (WINDOW_HEIGHT // 2) - (estimated_card_height // 2)
-    target_pos_player = ((WINDOW_WIDTH // 2) - 80, center_y)
-    target_pos_enemy = ((WINDOW_WIDTH // 2) + 20, center_y)
+    target_pos_player = ((WINDOW_WIDTH // 2) - 120, center_y)
+    target_pos_enemy = ((WINDOW_WIDTH // 2) + 40, center_y)
 
     move_speed = 25
     cleanup_speed = 35
@@ -77,12 +80,18 @@ def update_battle_sequence(player, enemy, display_surface):
             display_card(card, (card.position.x, card.position.y), display_surface)
 
             if arrived:
-                Battle_mode.apply_player_effect(player, enemy)
-                Battle_mode.battle_phase = Battle_mode.PHASE_ENEMY_CHOOSE
+                current_time = pygame.time.get_ticks()
+
+                if Battle_mode.timer_start == 0:
+                    Battle_mode.timer_start = current_time
+                    Battle_mode.apply_player_effect(player, enemy)
+
+                if current_time - Battle_mode.timer_start >= PLAYER_PHASE_DELAY:
+                    Battle_mode.battle_phase = Battle_mode.PHASE_ENEMY_CHOOSE
+                    Battle_mode.timer_start = 0
 
     # --- PHASE 2: ENEMY CHOOSES CARD ---
     elif Battle_mode.battle_phase == Battle_mode.PHASE_ENEMY_CHOOSE:
-        # Render player card waiting in center      ??? już jest wyświetlone
         if player.card_in_play:
             display_card(player.card_in_play, (player.card_in_play.position.x, player.card_in_play.position.y),
                          display_surface)
@@ -97,8 +106,7 @@ def update_battle_sequence(player, enemy, display_surface):
 
     # --- PHASE 3: ENEMY ANIMATION ---
     elif Battle_mode.battle_phase == Battle_mode.PHASE_ENEMY_ANIMATION:
-        # Keep drawing player card static
-        if player.card_in_play:     #??? już jest wyświetlone
+        if player.card_in_play:
             display_card(player.card_in_play, (player.card_in_play.position.x, player.card_in_play.position.y),
                          display_surface)
 
@@ -108,8 +116,13 @@ def update_battle_sequence(player, enemy, display_surface):
             display_card(card, (card.position.x, card.position.y), display_surface)
 
             if arrived:
-                Battle_mode.apply_enemy_effect(player, enemy)
-                Battle_mode.battle_phase = Battle_mode.PHASE_CLEANUP
+                current_time = pygame.time.get_ticks()
+                if Battle_mode.timer_start == 0:
+                    Battle_mode.timer_start = current_time
+                    Battle_mode.apply_enemy_effect(player, enemy)
+                if current_time - Battle_mode.timer_start >= ENEMY_PHASE_DELAY:
+                    Battle_mode.battle_phase = Battle_mode.PHASE_CLEANUP
+                    Battle_mode.timer_start = 0
 
     # --- PHASE 4: CLEANUP (Discard Animation) ---
     elif Battle_mode.battle_phase == Battle_mode.PHASE_CLEANUP:
