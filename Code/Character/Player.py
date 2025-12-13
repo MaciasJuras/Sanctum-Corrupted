@@ -1,8 +1,6 @@
-from Code.Graphics.Battle_graphic import display_cards_in_hand
 from Code.Settings import *
 from Code.Character.Character import Character
 from Code.Cards.Card import Card
-from Code.Graphics import Battle_graphic
 
 
 class Player(pygame.sprite.Sprite, Character):
@@ -25,7 +23,10 @@ class Player(pygame.sprite.Sprite, Character):
 
         self.mana = mana
         self.max_mana = mana
+
         self.in_battle = False
+        self.card_in_play = None
+        self.animation_step = 0  # 0 = Idle, 1 = Moving to Center, 2 = Effect/Pause, 3 = To Discard
 
     def load_images(self):
 

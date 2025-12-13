@@ -35,11 +35,6 @@ class CardModifier:
 
 
 class Card(ABC):
-    image_paths: Dict[School, str] = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
     
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         self.card_id = card_id
@@ -49,6 +44,8 @@ class Card(ABC):
         self.name = self.get_name(tier)
         self.modifiers: List[CardModifier] = []  # Temporary effects
         self.permanent_cost_change = 0  # From events/upgrades
+        self.position = None    #position of a card in a screen
+        self.graphic = None
 
     @abstractmethod
     def get_image_path(self) -> str:

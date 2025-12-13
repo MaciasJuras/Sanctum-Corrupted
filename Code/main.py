@@ -65,6 +65,7 @@ if __name__ == "__main__":
 
     player.new_game_starting_package()
     battle_initialized = False
+    mouse_pressed_last_frame = False
 
     while running:
         dt = clock.tick() / 1000
@@ -75,17 +76,22 @@ if __name__ == "__main__":
 
         if player.in_battle:
             e_pressed_last_frame = handle_battle_exit(player, e_pressed_last_frame)
+            mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
             #if current_room == (0, 0):
             bg_file = 'Battle1.jpg'
+            draw_battle_background(display_surface, bg_file)
 
             if not battle_initialized:
-                draw_battle_background(display_surface, bg_file)
+
 
                 player.start_battle()
                 player.start_turn()
-                display_cards_in_hand(player.hand, display_surface)
-
                 battle_initialized = True
+
+            display_cards_in_hand(player.hand, display_surface)
+
+            if player.card_in_play:
+                update_card_animation(player, enemy, display_surface)
 
             if not player.in_battle:
                 battle_initialized = False
