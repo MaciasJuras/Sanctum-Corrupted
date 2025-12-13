@@ -27,6 +27,7 @@ class Player(pygame.sprite.Sprite, Character):
         self.in_battle = False
         self.card_in_play = None
         self.animation_step = 0  # 0 = Idle, 1 = Moving to Center, 2 = Effect/Pause, 3 = To Discard
+        self.player_turn = True
 
     def load_images(self):
 
@@ -91,34 +92,6 @@ class Player(pygame.sprite.Sprite, Character):
         print(f"\n--- {self.name}'s Turn ---")
         self.draw_cards(self.max_cards - len(self.hand))
 
-    def choose_card_to_play(self, target: Character):
-        #Uses console input for now - need to be changed when we will have assets
-        playable_cards = [card for card in self.hand if card.mana_cost <= self.mana]
-        if not playable_cards:
-            print("You don't have enough mana to play any card. Your turn ends")
-            return False
-        while True:
-            try:
-                choice = input(f"Choose a card from the hand (1-indexed) or '0' to end turn: ")
-                if choice == '0':
-                    print(f"{self.name} ends their turn.")
-                    return False
-                chosen_index = int(choice)-1
-                if 0 <= chosen_index < len(self.hand):
-                    chosen_card = self.hand[chosen_index]
-                    if  chosen_card.mana_cost > self.mana:
-                        print(f"Not enough mana to play {chosen_card.name}")
-                        continue
-                    self.mana -= chosen_card.mana_cost
-                    print(f"{self.name} spends {chosen_card.mana_cost} mana. ({self.mana} remaining)")
-                    self.play_card(chosen_card, target)
-                    return True
-                else:
-                    print("Invalid choice. Please pick a number from your hand.")
-            except ValueError:
-                print("Invalid input. Please enter a number.")
-
     def end_battle(self):
         self.mana = self.max_mana
         print("Battle ended")
-
