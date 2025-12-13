@@ -1,6 +1,7 @@
 from Code.Settings import *
 from Code.Cards import Card
 from Code.Settings import WINDOW_WIDTH, WINDOW_HEIGHT
+from Code.GameState import Battle_mode
 import os
 
 TARGET_CARD_WIDTH = 120
@@ -52,50 +53,118 @@ def display_cards_in_hand(hand: list[Card], display_surface):
         card.position = pygame.Rect(x, y, TARGET_CARD_WIDTH, estimated_height)
         display_card(card, (x, y), display_surface)
 
-def update_card_animation(player, enemy, display_surface):
+
+def update_battle_sequence(player, enemy, display_surface):
     """
-    Called every frame in the main loop if player.card_in_play is not None.
-    Handles movement, waiting, and effects.
+    Main Battle Animation Loop.
+    Handles the sequence: Player Move -> Effect -> Enemy Move -> Effect -> Cleanup
     """
-    card = player.card_in_play
-    if not card:
-        return
 
-    target_x = (WINDOW_WIDTH // 2) - (card.position.width // 2)
-    target_y = (WINDOW_HEIGHT // 2) - (card.position.height // 2)
+    # Positions of cards in a center
+    estimated_card_height = int(TARGET_CARD_WIDTH * 1.4)
+    center_y = (WINDOW_HEIGHT // 2) - (estimated_card_height // 2)
+    target_pos_player = ((WINDOW_WIDTH // 2) - 80, center_y)
+    target_pos_enemy = ((WINDOW_WIDTH // 2) + 20, center_y)
 
-    # --- STEP 1: MOVE TO CENTER ---
-    if player.animation_step == 1:
-        move_speed = 25
+    move_speed = 25
+    cleanup_speed = 35
 
-        if card.position.x < target_x: card.position.x += move_speed
-        if card.position.x > target_x: card.position.x -= move_speed
-        if card.position.y < target_y: card.position.y += move_speed
-        if card.position.y > target_y: card.position.y -= move_speed
+    # --- PHASE 1: PLAYER ANIMATION ---
+    if Battle_mode.battle_phase == Battle_mode.PHASE_PLAYER_ANIMATION:
+        card = player.card_in_play
+        if card:
+            arrived = animate_move_to(card, target_pos_player, move_speed)
+            display_card(card, (card.position.x, card.position.y), display_surface)
 
-        if abs(card.position.x - target_x) < move_speed and abs(card.position.y - target_y) < move_speed:
-            card.position.x = target_x
-            card.position.y = target_y
-            player.animation_step = 2
+            if arrived:
+                Battle_mode.apply_player_effect(player, enemy)
+                Battle_mode.battle_phase = Battle_mode.PHASE_ENEMY_CHOOSE
 
-    # --- STEP 2: PAUSE & EXECUTE EFFECT ---
-    elif player.animation_step == 2:
+    # --- PHASE 2: ENEMY CHOOSES CARD ---
+    elif Battle_mode.battle_phase == Battle_mode.PHASE_ENEMY_CHOOSE:
+        # Render player card waiting in center      ??? już jest wyświetlone
+        if player.card_in_play:
+            display_card(player.card_in_play, (player.card_in_play.position.x, player.card_in_play.position.y),
+                         display_surface)
 
-        #card.play([player, enemy])
-        player.animation_step = 3
-        pass
+        has_card = Battle_mode.prepare_enemy_turn(enemy)
 
-    # --- STEP 3: MOVE TO DISCARD PILE ---
-    elif player.animation_step == 3:
-        move_speed = 10
-        card.position.x += move_speed
-        card.position.y += move_speed
+        if has_card:
+            Battle_mode.battle_phase = Battle_mode.PHASE_ENEMY_ANIMATION
+        else:
+            # Enemy didn't play card
+            Battle_mode.battle_phase = Battle_mode.PHASE_CLEANUP
 
-        # If off screen, finish
-        if card.position.x > WINDOW_WIDTH:
-            player.discard_pile.append(card)
-            player.card_in_play = None
-            player.animation_step = 0
-            print("Animation finished, waiting for input.")
+    # --- PHASE 3: ENEMY ANIMATION ---
+    elif Battle_mode.battle_phase == Battle_mode.PHASE_ENEMY_ANIMATION:
+        # Keep drawing player card static
+        if player.card_in_play:     #??? już jest wyświetlone
+            display_card(player.card_in_play, (player.card_in_play.position.x, player.card_in_play.position.y),
+                         display_surface)
 
-    display_card(card, (card.position.x, card.position.y), display_surface)
+        card = enemy.card_in_play
+        if card:
+            arrived = animate_move_to(card, target_pos_enemy, move_speed)
+            display_card(card, (card.position.x, card.position.y), display_surface)
+
+            if arrived:
+                Battle_mode.apply_enemy_effect(player, enemy)
+                Battle_mode.battle_phase = Battle_mode.PHASE_CLEANUP
+
+    # --- PHASE 4: CLEANUP (Discard Animation) ---
+    elif Battle_mode.battle_phase == Battle_mode.PHASE_CLEANUP:
+
+        finished_p = True
+        finished_e = True
+
+        # Move Player Card to bottom-left
+        if player.card_in_play:
+            finished_p = animate_move_to(player.card_in_play, (100, WINDOW_HEIGHT + 200), cleanup_speed)
+            display_card(player.card_in_play, (player.card_in_play.position.x, player.card_in_play.position.y),
+                         display_surface)
+
+            if finished_p:
+                player.discard_pile.append(player.card_in_play)
+                player.card_in_play = None
+
+        # Move Enemy Card to top-right (Discard)
+        if enemy.card_in_play:
+            finished_e = animate_move_to(enemy.card_in_play, (WINDOW_WIDTH - 100, -200), cleanup_speed)
+            display_card(enemy.card_in_play, (enemy.card_in_play.position.x, enemy.card_in_play.position.y),
+                         display_surface)
+
+            if finished_e:
+                enemy.discard_pile.append(enemy.card_in_play)
+                enemy.card_in_play = None
+
+        if finished_p and finished_e:
+            Battle_mode.battle_phase = Battle_mode.PHASE_IDLE
+            print("Turn complete. Waiting for player input.")
+
+
+def animate_move_to(card, target, speed):
+    """Helper to move card rect toward target (x,y). Returns True if arrived."""
+    tx, ty = target
+
+    # if card position is missing
+    if not hasattr(card, 'position') or card.position is None:
+        card.position = pygame.Rect(0, 0, TARGET_CARD_WIDTH, int(TARGET_CARD_WIDTH * 1.4))
+
+    cx, cy = card.position.x, card.position.y
+
+    dist_x = tx - cx
+    dist_y = ty - cy
+
+    # Check if close enough to snap
+    if abs(dist_x) < speed and abs(dist_y) < speed:
+        card.position.x = tx
+        card.position.y = ty
+        return True
+
+    import math
+    dist = math.hypot(dist_x, dist_y)
+    if dist != 0:
+        card.position.x += (dist_x / dist) * speed
+        card.position.y += (dist_y / dist) * speed
+
+    return False
