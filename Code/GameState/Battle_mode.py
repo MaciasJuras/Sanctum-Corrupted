@@ -30,3 +30,25 @@ def handle_battle_exit(player, e_pressed_last_frame):
         player.end_battle()
 
     return e_pressed
+
+
+def handle_card_selection(player, mouse_pressed_last_frame):
+    """
+    Detects if the player clicked on a card in their hand.
+    Returns the new state of the mouse button (to prevent multi-clicks).
+    """
+    mouse_pressed = pygame.mouse.get_pressed()[0]
+
+    if mouse_pressed and not mouse_pressed_last_frame:
+        mouse_pos = pygame.mouse.get_pos()
+
+        if player.card_in_play is None:
+            for card in player.hand:
+                if card.position and card.position.collidepoint(mouse_pos):
+                    print(f"Clicked on: {card.name}")
+                    player.hand.remove(card)
+                    player.card_in_play = card
+                    player.animation_step = 1
+                    break
+
+    return mouse_pressed
