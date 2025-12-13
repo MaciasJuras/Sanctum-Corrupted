@@ -2,8 +2,8 @@ from Code.Settings import *
 from Code.Cards import Card
 import os
 
-TARGET_CARD_WIDTH = 150
-CARD_SPACING = 2
+TARGET_CARD_WIDTH = 120
+CARD_SPACING = -10
 CARD_SPACE_FROM_BOTTOM_SCREEN = 0.5
 
 def draw_battle_background(display_surface, bg_name):

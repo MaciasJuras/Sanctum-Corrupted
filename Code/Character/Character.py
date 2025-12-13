@@ -25,6 +25,10 @@ class Character(ABC):
         card = create_card(get_random_card_ids(1)[0],tier,school_enum)
         self.full_deck.append(card)
 
+    def new_game_starting_package(self):
+        for _ in range(10):
+            self.get_new_card(0, 'NORMAL')
+
     def start_battle(self):
         self.draw_pile = self.full_deck.copy()
         random.shuffle(self.draw_pile)
