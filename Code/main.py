@@ -63,8 +63,7 @@ if __name__ == "__main__":
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
     enemy = MagicRat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, 20, [])
 
-    player.get_new_card(0,'MAGICAL')
-    player.get_new_card(0,'NORMAL')
+    player.new_game_starting_package()
     battle_initialized = False
 
     while running:
