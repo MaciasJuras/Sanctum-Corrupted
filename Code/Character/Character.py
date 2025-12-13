@@ -110,6 +110,40 @@ class Character(ABC):
             self.health = self.max_health
         print(f"[{self.name}] heals, {amount} HP remaining.")
 
+    def add_mana(self, amount: int):
+        """Used by ManaGain card"""
+        if hasattr(self, 'mana'):
+            self.mana += amount
+            if self.mana > self.max_mana:
+                self.mana = self.max_mana
+            print(f"[{self.name}] recovered {amount} Mana. ({self.mana}/{self.max_mana})")
+
+    def add_block(self, amount: int):
+        """Used by ShieldUp, Parry, Dodge, etc."""
+        # You likely need a self.block variable in __init__ later
+        print(f"[{self.name}] gained {amount} Block.")
+        pass
+
+    def add_dodge(self, amount: int):
+        """Used by Dodge"""
+        print(f"[{self.name}] gained {amount} Dodge.")
+        pass
+
+    def add_armor(self, amount: int):
+        """Used by ArmorUp"""
+        print(f"[{self.name}] gained {amount} Armor.")
+        pass
+
+    def add_thorns(self, damage: int, stacks: int):
+        """Used by CounterAttack"""
+        print(f"[{self.name}] gained {damage} Thorns ({stacks} stacks).")
+        pass
+
+    def add_regeneration(self, heal_amount: int, duration: int):
+        """Used by Regeneration"""
+        print(f"[{self.name}] gained Regeneration: {heal_amount} HP for {duration} turns.")
+        pass
+
     # --- Deck / Hand Manipulation Cards effects ---
 
     def draw_cards_special(self, amount: int) -> list:

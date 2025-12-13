@@ -8,6 +8,7 @@ PHASE_ENEMY_ANIMATION = 3     # Enemy card moving to center
 PHASE_CLEANUP = 4        # Both cards moving to discard piles
 
 battle_phase = PHASE_IDLE
+timer_start = 0     # To manipulate time in battle
 
 def handle_enemy_interaction(enemy_sprites, player):
     """ Checks for SPACE key press and direct collision with an enemy

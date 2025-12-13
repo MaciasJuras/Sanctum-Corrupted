@@ -27,7 +27,7 @@ class Enemy(pygame.sprite.Sprite, Character):
 
     def choose_card_to_play(self):
         #AI logic will be implemented here. For now It's just random choice
-        playable_cards = [card for card in self.hand if card.cost <= self.mana]
+        playable_cards = [card for card in self.hand if card.mana_cost <= self.mana]
         if not playable_cards:
             print(f"[{self.name}] has no playable cards and ends its turn.")
             return None
