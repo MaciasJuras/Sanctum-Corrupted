@@ -67,10 +67,12 @@ if __name__ == "__main__":
     enemy = MagicRat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, 20, [])
     enemy.new_game_starting_package()
 
+    enemy2 = TechRat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Rat', 100, 20, [])
+    enemy2.new_game_starting_package()
+
 #--- Parameters for tracking game phase and mouse clicks
     battle_initialized = False
     mouse_pressed_last_frame = False
-
 
 #--- Game loop ---
     while running:
@@ -86,8 +88,12 @@ if __name__ == "__main__":
             mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
 
             # --- Background Initialization ---
-                #if current_room == (0, 0):
-            bg_file = 'Battle1.jpg'
+            if enemy.name == 'Magic Rat':
+                bg_file = 'chamber-magical.png'
+            elif enemy.name == 'Tech Rat':
+                bg_file = 'chamber-technical.png'
+            else:
+                bg_file = 'chamber-normal.png'
             draw_battle_background(display_surface, bg_file)
 
             if not battle_initialized:
