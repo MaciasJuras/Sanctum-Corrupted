@@ -10,6 +10,7 @@ class Enemy(pygame.sprite.Sprite, Character):
     def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
         pygame.sprite.Sprite.__init__(self, groups)
         Character.__init__(self, name, health, full_deck if full_deck else [])
+        self.type = 'Normal'
         self.mana = mana
         self.max_mana = mana
         self.card_in_play = None
@@ -19,6 +20,14 @@ class Enemy(pygame.sprite.Sprite, Character):
 
         self.rect = self.image.get_frect(center=pos)
         self.position = pygame.math.Vector2(pos)
+
+    def give_type(self, type):
+        if type == 'Magical':
+            self.type = 'Magical'
+        elif type == 'Technical':
+            self.type = 'Technical'
+        else:
+            self.type = 'Normal'
 
     def start_turn(self):
         print(f"\n--- {self.name}'s Turn ---")

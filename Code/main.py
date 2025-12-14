@@ -65,9 +65,11 @@ if __name__ == "__main__":
     player.new_game_starting_package()
 
     enemy = MagicRat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, 20, [])
+    enemy.give_type('Magical')
     enemy.new_game_starting_package()
 
     enemy2 = TechRat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Rat', 100, 20, [])
+    enemy2.give_type('Technical')
     enemy2.new_game_starting_package()
 
 #--- Parameters for tracking game phase and mouse clicks
@@ -88,9 +90,9 @@ if __name__ == "__main__":
             mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
 
             # --- Background Initialization ---
-            if enemy.name == 'Magic Rat':
+            if enemy.type == 'Magical':
                 bg_file = 'chamber-magical.png'
-            elif enemy.name == 'Tech Rat':
+            elif enemy.type == 'Technical':
                 bg_file = 'chamber-technical.png'
             else:
                 bg_file = 'chamber-normal.png'
@@ -104,7 +106,7 @@ if __name__ == "__main__":
                 player.start_battle()
                 player.start_turn()
 
-                # Reset Battle State
+                # --- Reset Battle State ---
                 Battle_mode.battle_phase = Battle_mode.PHASE_IDLE
                 player.card_in_play = None
                 enemy.card_in_play = None
