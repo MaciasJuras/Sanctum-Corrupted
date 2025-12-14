@@ -88,9 +88,9 @@ if __name__ == "__main__":
             mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
 
             # --- Background Initialization ---
-            if enemy.name == 'Magic Rat':
+            if enemy.type == 'Magical':
                 bg_file = 'chamber-magical.png'
-            elif enemy.name == 'Tech Rat':
+            elif enemy.type == 'Technical':
                 bg_file = 'chamber-technical.png'
             else:
                 bg_file = 'chamber-normal.png'
@@ -104,7 +104,7 @@ if __name__ == "__main__":
                 player.start_battle()
                 player.start_turn()
 
-                # Reset Battle State
+                # --- Reset Battle State ---
                 Battle_mode.battle_phase = Battle_mode.PHASE_IDLE
                 player.card_in_play = None
                 enemy.card_in_play = None
