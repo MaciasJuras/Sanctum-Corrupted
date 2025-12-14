@@ -12,6 +12,8 @@ class Enemy(pygame.sprite.Sprite, Character):
         Character.__init__(self, name, health, full_deck if full_deck else [])
         self.mana = mana
         self.max_mana = mana
+        self.card_in_play = None
+
         self.image = pygame.Surface((64, 64))  # Placeholder size
         self.image.fill((100, 100, 100))  # Generic gray placeholder
 
@@ -23,16 +25,14 @@ class Enemy(pygame.sprite.Sprite, Character):
         self.draw_cards(self.max_cards - len(self.hand))
         print(f"[{self.name}] Health: {self.health}/{self.max_health}")
 
-    def choose_card_to_play(self, target: Character):
+    def choose_card_to_play(self):
         #AI logic will be implemented here. For now It's just random choice
-        playable_cards = [card for card in self.hand if card.cost <= self.mana]
+        playable_cards = [card for card in self.hand if card.mana_cost <= self.mana]
         if not playable_cards:
             print(f"[{self.name}] has no playable cards and ends its turn.")
-            return False
+            return None
         chosen_card = random.choice(playable_cards)
-        self.mana -= chosen_card.cost
-        self.play_card(chosen_card, target)
-        return True
+        return chosen_card
 
     def end_battle(self):
         pass
@@ -51,3 +51,19 @@ class MagicRat(Enemy):
                 self.image.fill((0, 0, 255))
 
             self.rect = self.image.get_frect(center=pos)
+
+
+class TechRat(Enemy):
+    def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
+        super().__init__(pos, groups, name, health, mana, full_deck)
+        self.mana = mana
+        image_path = "Assets/Images/Enemies/tech-rat.png"
+
+        try:
+            self.image = pygame.image.load(image_path).convert_alpha()
+        except pygame.error:
+            # Fallback if image path is bad
+            self.image = pygame.Surface((64, 64))
+            self.image.fill((0, 0, 255))
+
+        self.rect = self.image.get_frect(center=pos)

@@ -40,6 +40,7 @@ def draw_room_name(display_surface, current_room, rooms, font_size=32):
 """
 
 if __name__ == "__main__":
+#--- Map load ---
     pygame.init()
     display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption('Sanctum Corrupted')
@@ -59,14 +60,21 @@ if __name__ == "__main__":
     for room_pos in room_positions:
         load_room(room_pos, room_classes[room_pos], all_sprites, collision_sprites, door_sprites, rooms)
 
-
+#--- Player and enemy declaration
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
+    player.new_game_starting_package()
+
     enemy = MagicRat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, 20, [])
+    enemy.new_game_starting_package()
 
-    player.get_new_card(0,'MAGICAL')
-    player.get_new_card(0,'NORMAL')
+    enemy2 = TechRat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Rat', 100, 20, [])
+    enemy2.new_game_starting_package()
+
+#--- Parameters for tracking game phase and mouse clicks
     battle_initialized = False
+    mouse_pressed_last_frame = False
 
+#--- Game loop ---
     while running:
         dt = clock.tick() / 1000
 
@@ -75,18 +83,38 @@ if __name__ == "__main__":
                 running = False
 
         if player.in_battle:
+            # --- Checking mouse and keyboard button press ---
             e_pressed_last_frame = handle_battle_exit(player, e_pressed_last_frame)
-            #if current_room == (0, 0):
-            bg_file = 'Battle1.jpg'
+            mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
+
+            # --- Background Initialization ---
+            if enemy.name == 'Magic Rat':
+                bg_file = 'chamber-magical.png'
+            elif enemy.name == 'Tech Rat':
+                bg_file = 'chamber-technical.png'
+            else:
+                bg_file = 'chamber-normal.png'
+            draw_battle_background(display_surface, bg_file)
 
             if not battle_initialized:
-                draw_battle_background(display_surface, bg_file)
+                # --- Battle Initialization ---
+                enemy.start_battle()
+                enemy.draw_cards(10)
 
                 player.start_battle()
                 player.start_turn()
-                display_cards_in_hand(player.hand, display_surface)
+
+                # Reset Battle State
+                Battle_mode.battle_phase = Battle_mode.PHASE_IDLE
+                player.card_in_play = None
+                enemy.card_in_play = None
 
                 battle_initialized = True
+
+            display_cards_in_hand(player.hand, display_surface)
+
+            if Battle_mode.battle_phase != Battle_mode.PHASE_IDLE:
+                update_battle_sequence(player, enemy, display_surface)
 
             if not player.in_battle:
                 battle_initialized = False
@@ -94,7 +122,10 @@ if __name__ == "__main__":
         else:
             all_sprites.update(dt)
 
-            _, space_pressed_last_frame = handle_enemy_interaction(enemy_sprites, player)
+            found_enemy, space_pressed_last_frame = handle_enemy_interaction(enemy_sprites, player)
+
+            if found_enemy:
+                enemy = found_enemy
 
             current_room, e_pressed_last_frame = handle_door_interaction(door_sprites,  current_room,  player,  rooms,  e_pressed_last_frame)
 

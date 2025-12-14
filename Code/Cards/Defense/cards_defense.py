@@ -3,12 +3,6 @@ from ..Card import Card, School, CardModifier, EffectTiming
 
 class ShieldUp(Card):
     """Basic defense card"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -53,12 +47,6 @@ class ShieldUp(Card):
 
 class Dodge(Card):
     """Avoid next attack"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -96,12 +84,6 @@ class Dodge(Card):
 
 class ArmorUp(Card):
     """Permanent damage reduction"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -144,12 +126,6 @@ class ArmorUp(Card):
 
 class CounterAttack(Card):
     """Damage enemy when hit"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -194,12 +170,6 @@ class CounterAttack(Card):
 
 class Regeneration(Card):
     """Heal over time"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -241,12 +211,6 @@ class Regeneration(Card):
 
 class Heal(Card):
     """Immediate healing"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -290,12 +254,6 @@ class Heal(Card):
 
 class Parry(Card):
     """Block and counter"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     

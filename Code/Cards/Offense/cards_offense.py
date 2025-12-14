@@ -3,12 +3,6 @@ from ..Card import Card, School, CardModifier, EffectTiming
 
 class Strike(Card):
     """Basic attack card"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -52,12 +46,6 @@ class Strike(Card):
 
 class Slash(Card):
     """Multiple weak hits"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -105,15 +93,8 @@ class Slash(Card):
         return ''
 
 
-
 class HeavyStrike(Card):
     """High cost, high damage"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -162,12 +143,6 @@ class HeavyStrike(Card):
 
 class Execute(Card):
     """Bonus damage to wounded enemies"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -221,12 +196,6 @@ class Execute(Card):
 
 class PoisonStrike(Card):
     """Damage over time"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     
@@ -271,12 +240,6 @@ class PoisonStrike(Card):
 
 class AreaAttack(Card):
     """Damage all enemies"""
-    image_paths = {
-        School.NORMAL: '',
-        School.MAGICAL: '',
-        School.TECHNICAL: '',
-    }
-    
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
     

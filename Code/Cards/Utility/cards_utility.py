@@ -1,6 +1,5 @@
 from ..Card import Card, School, CardModifier, EffectTiming
 
-
 class DrawCards(Card):
     """Simple card draw"""
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
@@ -34,7 +33,7 @@ class DrawCards(Card):
         else:
             num_cards = 2 + tier
         
-        game_state[0].draw_cards(num_cards)
+        game_state[0].draw_cards_special(num_cards)
 
     def get_image_path(self) -> str:
         if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
@@ -72,7 +71,7 @@ class DrawAndDiscount(Card):
             num_cards = 3 + tier
             discount = -2
         
-        drawn_cards = game_state[0].draw_cards(num_cards)
+        drawn_cards = game_state[0].draw_cards_special(num_cards)
         
         discount_modifier = CardModifier(
             cost_change=discount,
@@ -249,11 +248,11 @@ class Cycle(Card):
         num_cards = 2 + tier
         
         if self.school == School.TECHNICAL:
-            game_state[0].draw_cards(num_cards)
+            game_state[0].draw_cards_special(num_cards)
             game_state[0].discard_from_hand(num_cards)
         else:
             game_state[0].discard_from_hand(num_cards)
-            game_state[0].draw_cards(num_cards)
+            game_state[0].draw_cards_special(num_cards)
 
     def get_image_path(self) -> str:
         if self.school == School.NORMAL: return 'Assets/Images/Cards/Damage/card-strike-normal.png'
@@ -392,7 +391,6 @@ class CostReduction(Card):
         if self.school == School.MAGICAL: return 'Assets/Images/Cards/Damage/card-strike-magical.png'
         if self.school == School.TECHNICAL: return 'Assets/Images/Cards/Damage/card-strike-technical.png'
         return ''
-
 
 class ExhaustForEffect(Card):
     """Remove card for powerful effect"""
