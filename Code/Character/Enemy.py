@@ -50,6 +50,7 @@ class MagicRat(Enemy):
         def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
             super().__init__(pos, groups, name, health, mana, full_deck)
             self.mana = mana
+            self.give_type('Magical')
             image_path = "Assets/Images/Enemies/magic-rat.png"
 
             try:
@@ -66,6 +67,7 @@ class TechRat(Enemy):
     def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
         super().__init__(pos, groups, name, health, mana, full_deck)
         self.mana = mana
+        self.give_type('Technical')
         image_path = "Assets/Images/Enemies/tech-rat.png"
 
         try:
