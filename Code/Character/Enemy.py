@@ -51,3 +51,19 @@ class MagicRat(Enemy):
                 self.image.fill((0, 0, 255))
 
             self.rect = self.image.get_frect(center=pos)
+
+
+class TechRat(Enemy):
+    def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
+        super().__init__(pos, groups, name, health, mana, full_deck)
+        self.mana = mana
+        image_path = "Assets/Images/Enemies/tech-rat.png"
+
+        try:
+            self.image = pygame.image.load(image_path).convert_alpha()
+        except pygame.error:
+            # Fallback if image path is bad
+            self.image = pygame.Surface((64, 64))
+            self.image.fill((0, 0, 255))
+
+        self.rect = self.image.get_frect(center=pos)
