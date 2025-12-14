@@ -113,7 +113,7 @@ class Card(ABC):
         """
         Generates a card image from a Card object instance.
         """
-        font = 'Jersey10.ttf'
+        font = 'Assets/Font/Jersey10.ttf'
 
         NAME_FONT_SIZE = 40
         MANA_FONT_SIZE = 40
@@ -149,10 +149,10 @@ class Card(ABC):
 
             # Reduce name size slightly if the text is very long
             if len(self.get_name(self.tier)) > 10:
-                name_font = ImageFont.truetype(font_name, int(NAME_FONT_SIZE * 0.8))
+                name_font = ImageFont.truetype(font, int(NAME_FONT_SIZE * 0.8))
 
             self.draw_text_centered(draw, str(self.get_base_cost(self.tier)), 30, 30, mana_font)
-            self.draw_text_centered(draw, self.get_name(self.tier), 143, 40, name_font)
+            self.draw_text_centered(draw, self.get_name(self.tier), 143, 38, name_font)
             self.draw_text_centered(draw, str(self.get_effect_value(self.tier)), 246, 313, value_font)
         except Exception as e:
             print(f"An unexpected error occurred during image generation: {e}")

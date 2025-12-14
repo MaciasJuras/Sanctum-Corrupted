@@ -2,32 +2,35 @@ import random
 import pygame
 
 from Code.Character.Character import Character
-from Code.Cards.Card import Card
+from Code.Cards.Card import *
 
 class Enemy(pygame.sprite.Sprite, Character):
         #The Enemy class, inheriting all logic from Character and adding its own AI logic for choosing cards.
 
-    def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
+    def __init__(self, pos, groups, name, health, full_deck: list[Card], tier, school: School = School.NORMAL):
         pygame.sprite.Sprite.__init__(self, groups)
         Character.__init__(self, name, health, full_deck if full_deck else [])
-        self.type = 'Normal'
-        self.mana = mana
-        self.max_mana = mana
+        #self.type = 'Normal'
         self.card_in_play = None
-
+        self.tier = tier
+        self.school = school
         self.image = pygame.Surface((64, 64))  # Placeholder size
         self.image.fill((100, 100, 100))  # Generic gray placeholder
 
         self.rect = self.image.get_frect(center=pos)
         self.position = pygame.math.Vector2(pos)
 
-    def give_type(self, type):
-        if type == 'Magical':
-            self.type = 'Magical'
-        elif type == 'Technical':
-            self.type = 'Technical'
-        else:
-            self.type = 'Normal'
+    @abstractmethod
+    def get_max_health(self, tier: int) -> int:
+        pass
+
+    @abstractmethod
+    def get_max_mana(self, tier: int) -> int:
+        pass
+
+    @abstractmethod
+    def get_name(self, tier: int) -> str:
+        pass
 
     def start_turn(self):
         print(f"\n--- {self.name}'s Turn ---")
@@ -45,36 +48,3 @@ class Enemy(pygame.sprite.Sprite, Character):
 
     def end_battle(self):
         pass
-
-class MagicRat(Enemy):
-        def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
-            super().__init__(pos, groups, name, health, mana, full_deck)
-            self.mana = mana
-            self.give_type('Magical')
-            image_path = "Assets/Images/Enemies/magic-rat.png"
-
-            try:
-                self.image = pygame.image.load(image_path).convert_alpha()
-            except pygame.error:
-                # Fallback if image path is bad
-                self.image = pygame.Surface((64, 64))
-                self.image.fill((0, 0, 255))
-
-            self.rect = self.image.get_frect(center=pos)
-
-
-class TechRat(Enemy):
-    def __init__(self, pos, groups, name, health, mana, full_deck: list[Card]):
-        super().__init__(pos, groups, name, health, mana, full_deck)
-        self.mana = mana
-        self.give_type('Technical')
-        image_path = "Assets/Images/Enemies/tech-rat.png"
-
-        try:
-            self.image = pygame.image.load(image_path).convert_alpha()
-        except pygame.error:
-            # Fallback if image path is bad
-            self.image = pygame.Surface((64, 64))
-            self.image.fill((0, 0, 255))
-
-        self.rect = self.image.get_frect(center=pos)
