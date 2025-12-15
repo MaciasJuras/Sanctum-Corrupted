@@ -65,10 +65,10 @@ if __name__ == "__main__":
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
     player.new_game_starting_package()
 
-    enemy = Rat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, [], 0, School.MAGICAL)
+    enemy = Cat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Cat', 100, [], 0, School.MAGICAL)
     enemy.new_game_starting_package()
 
-    enemy2 = Rat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Rat', 100, [], 0, School.TECHNICAL)
+    enemy2 = Cat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Cat', 100, [], 0, School.TECHNICAL)
     enemy2.new_game_starting_package()
 
 #--- Parameters for tracking game phase and mouse clicks
