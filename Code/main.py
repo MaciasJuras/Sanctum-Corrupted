@@ -8,6 +8,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 from Code.Character.Player import Player
 from Code.Character.Enemy import *
+from Code.Character.Enemies import *
 from Code.Settings import *
 from Code.Graphics.Groups import AllSprites
 from Code.Map.Map import generate_rooms, load_room, draw_minimap
@@ -64,10 +65,10 @@ if __name__ == "__main__":
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
     player.new_game_starting_package()
 
-    enemy = MagicRat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Rat', 100, 20, [])
+    enemy = Cat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Cat', 100, [], 0, School.MAGICAL)
     enemy.new_game_starting_package()
 
-    enemy2 = TechRat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Rat', 100, 20, [])
+    enemy2 = Cat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Cat', 100, [], 0, School.TECHNICAL)
     enemy2.new_game_starting_package()
 
 #--- Parameters for tracking game phase and mouse clicks
@@ -88,9 +89,9 @@ if __name__ == "__main__":
             mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
 
             # --- Background Initialization ---
-            if enemy.type == 'Magical':
+            if enemy.school == School.MAGICAL:
                 bg_file = 'chamber-magical.png'
-            elif enemy.type == 'Technical':
+            elif enemy.school == School.TECHNICAL:
                 bg_file = 'chamber-technical.png'
             else:
                 bg_file = 'chamber-normal.png'
