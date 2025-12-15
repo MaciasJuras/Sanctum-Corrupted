@@ -7,10 +7,10 @@ from Code.Cards.Card import *
 class Enemy(pygame.sprite.Sprite, Character):
         #The Enemy class, inheriting all logic from Character and adding its own AI logic for choosing cards.
 
-    def __init__(self, pos, groups, name, health, full_deck: list[Card], tier, school: School = School.NORMAL):
+    def __init__(self, pos, groups, name, health, full_deck: list[Card], tier, school: School = School.MAGICAL): #there are no NORMAL enemies
         pygame.sprite.Sprite.__init__(self, groups)
         Character.__init__(self, name, health, full_deck if full_deck else [])
-        #self.type = 'Normal'
+
         self.card_in_play = None
         self.tier = tier
         self.school = school
