@@ -89,8 +89,8 @@ class Card(ABC):
 
     def play(self, game_state):
         # Remove "until played" modifiers before playing
-        self.remove_modifiers_by_timing(EffectTiming.UNTIL_PLAYED)
         self.effect(game_state, self.tier)
+        self.remove_modifiers_by_timing(EffectTiming.UNTIL_PLAYED)
 
     def upgrade(self):
         self.tier += 1

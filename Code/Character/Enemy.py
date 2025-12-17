@@ -14,6 +14,10 @@ class Enemy(pygame.sprite.Sprite, Character):
         self.card_in_play = None
         self.tier = tier
         self.school = school
+
+        self.max_mana = self.get_max_mana(tier)
+        self.mana = self.max_mana
+
         self.image = pygame.Surface((64, 64))  # Placeholder size
         self.image.fill((100, 100, 100))  # Generic gray placeholder
 
@@ -45,6 +49,3 @@ class Enemy(pygame.sprite.Sprite, Character):
             return None
         chosen_card = random.choice(playable_cards)
         return chosen_card
-
-    def end_battle(self):
-        pass

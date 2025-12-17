@@ -92,6 +92,3 @@ class Player(pygame.sprite.Sprite, Character):
         print(f"\n--- {self.name}'s Turn ---")
         self.draw_cards(self.max_cards - len(self.hand))
 
-    def end_battle(self):
-        self.mana = self.max_mana
-        print("Battle ended")
