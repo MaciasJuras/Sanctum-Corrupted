@@ -70,6 +70,7 @@ class Character(ABC):
 
     def end_battle(self, win):
         self.mana = self.max_mana
+        self.health = self.max_health
         if win:
             print("You win!")
             self.get_new_card(0, 'NORMAL')
