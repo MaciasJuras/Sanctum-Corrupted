@@ -33,7 +33,7 @@ def handle_battle_exit(player, e_pressed_last_frame):
     if e_pressed and not e_pressed_last_frame:
         print("Exiting battle mode!")
         player.in_battle = False
-        player.end_battle()
+        player.end_battle(False)
 
     return e_pressed
 
@@ -52,10 +52,16 @@ def handle_card_selection(player, mouse_pressed_last_frame):
         for card in player.hand:
             # Check collision with the card's visual rect
             if card.position and card.position.collidepoint(mouse_pos):
+                if player.mana < card.mana_cost:
+                    print(f"Not enough Mana! Cost: {card.mana_cost}, Have: {player.mana}")
+                    break
+
                 print(f"Clicked on: {card.name}")
 
                 if card in player.hand:
+                    player.mana -= card.mana_cost
                     player.hand.remove(card)
+                    print(f"Player mana = {player.mana}")
 
                 player.card_in_play = card
                 battle_phase = PHASE_PLAYER_ANIMATION
@@ -68,13 +74,19 @@ def handle_card_selection(player, mouse_pressed_last_frame):
 
 def apply_player_effect(player, enemy):
     """Called when player card hits the center."""
+    global battle_phase
     if player.card_in_play:
         print(f"Player effect: {player.card_in_play.name}")
         player.card_in_play.play([player, enemy])
 
         if enemy.health <= 0:
-            print("ENEMY DEFEATED!")
-            #win logic here in future
+            player.end_battle(True)
+            player.in_battle = False
+            enemy.kill()
+            battle_phase = PHASE_IDLE
+            return
+
+        player.draw_cards(1)
 
 
 def prepare_enemy_turn(enemy):
@@ -84,6 +96,8 @@ def prepare_enemy_turn(enemy):
     if enemy_card:
         if enemy_card in enemy.hand:
             enemy.hand.remove(enemy_card)
+            enemy.mana -= enemy_card.mana_cost
+            print(f"Enemy mana = {enemy.mana}")
 
         enemy.card_in_play = enemy_card
 
@@ -101,9 +115,15 @@ def prepare_enemy_turn(enemy):
 
 def apply_enemy_effect(player, enemy):
     """Called when enemy card hits the center."""
+    global battle_phase
     if enemy.card_in_play:
         print(f"Enemy effect: {enemy.card_in_play.name}")
         enemy.card_in_play.play([enemy, player])
 
         if player.health <= 0:
-            print("PLAYER DEFEATED!")
+            player.end_battle(False)
+            player.in_battle = False
+            battle_phase = PHASE_IDLE
+            return
+
+        enemy.draw_cards(1)

@@ -26,7 +26,7 @@ class Character(ABC):
         self.full_deck.append(card)
 
     def new_game_starting_package(self):
-        for _ in range(10):
+        for _ in range(15):
             self.get_new_card(0, 'NORMAL')
 
     def start_battle(self):
@@ -38,6 +38,9 @@ class Character(ABC):
 
     def draw_cards(self, amount: int):
         for _ in range(amount):
+            if len(self.hand) >= self.max_cards:
+                print(f"[{self.name}] Hand is full ({self.max_cards})! Cannot draw more.")
+                break
             if not self.draw_pile:
                 if not self.discard_pile:
                     print(f"[{self.name}] is out of cards to draw!")
@@ -65,9 +68,13 @@ class Character(ABC):
     def start_turn(self):
         pass
 
-    @abstractmethod
-    def end_battle(self):
-        pass
+    def end_battle(self, win):
+        self.mana = self.max_mana
+        if win:
+            print("You win!")
+            self.get_new_card(0, 'NORMAL')
+        else:
+            print("You lost!")
 
     # --- Combat / Damage Cards effects ---
     def deal_damage(self, damage: int, ignore_armor: bool = False):

@@ -8,8 +8,8 @@ TARGET_CARD_WIDTH = 120
 CARD_SPACING = -10
 CARD_SPACE_FROM_BOTTOM_SCREEN = 0.5
 
-PLAYER_PHASE_DELAY = 5000 # 5 seconds
-ENEMY_PHASE_DELAY = 5000  # 5 seconds
+PLAYER_PHASE_DELAY = 2000 # 2 seconds
+ENEMY_PHASE_DELAY = 2000  # 2 seconds
 
 def draw_battle_background(display_surface, bg_name):
     battle_background_path = join('Assets/Images/Battle', bg_name)
