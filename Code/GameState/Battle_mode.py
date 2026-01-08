@@ -1,5 +1,7 @@
 import pygame
 
+from Code.Graphics.Battle_graphic import *
+
 # --- Battle State Constants ---
 PHASE_IDLE = 0
 PHASE_PLAYER_ANIMATION = 1    # Player card moving to center
@@ -89,7 +91,7 @@ def apply_player_effect(player, enemy):
         player.draw_cards(1)
 
 
-def prepare_enemy_turn(enemy):
+def prepare_enemy_turn(enemy, enemy_hand_positions):
     """Called after player effect. Enemy picks a card."""
     enemy_card = enemy.choose_card_to_play()
 
@@ -99,15 +101,13 @@ def prepare_enemy_turn(enemy):
             enemy.mana -= enemy_card.mana_cost
             print(f"Enemy mana = {enemy.mana}")
 
-        enemy.card_in_play = enemy_card
-
-        # Set starting position for animation (e.g., from the Enemy's body)
-        # We need a temporary rect for the card if it doesn't have one
-        if not hasattr(enemy_card, 'position') or enemy_card.position is None:
-            enemy_card.position = pygame.Rect(enemy.rect.centerx, enemy.rect.centery, 0, 0)
+        if enemy_card in enemy_hand_positions:
+            start_x, start_y = enemy_hand_positions[enemy_card]
         else:
-            enemy_card.position.x = enemy.rect.centerx
-            enemy_card.position.y = enemy.rect.centery
+            start_x, start_y = (WINDOW_WIDTH // 2, 0)
+
+        enemy.card_in_play = enemy_card
+        enemy.card_in_play.position = pygame.Rect(start_x, start_y, TARGET_CARD_WIDTH, int(TARGET_CARD_WIDTH * 1.4))
 
         return True  # Enemy played a card
     return False  # Enemy passed turn
