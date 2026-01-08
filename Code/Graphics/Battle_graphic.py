@@ -56,6 +56,39 @@ def display_cards_in_hand(hand: list[Card], display_surface):
         card.position = pygame.Rect(x, y, TARGET_CARD_WIDTH, estimated_height)
         display_card(card, (x, y), display_surface)
 
+def display_enemy_hand(hand: list[Card], display_surface, enemy_card_in_play=None):
+    """Draws the enemy's hand at the top of the screen using the back image."""
+    if not hand:
+        return
+
+    total_width = len(hand) * (TARGET_CARD_WIDTH + CARD_SPACING) - CARD_SPACING
+    start_x = (display_surface.get_width() - total_width) // 2
+    y = -10
+
+    estimated_height = int(TARGET_CARD_WIDTH * 1.4)
+    card_back_path = 'Assets/Images/Cards/back.png'
+
+    card_positions = {}
+    TRANSPARENCY_VALUE = 130
+
+    try:
+        back_surf = pygame.image.load(card_back_path).convert_alpha()
+        back_surf = pygame.transform.smoothscale(back_surf, (TARGET_CARD_WIDTH, estimated_height))
+
+        back_surf.set_alpha(TRANSPARENCY_VALUE)
+        back_surf = pygame.transform.rotate(back_surf, 180)
+
+        for i, card in enumerate(hand):
+            x = start_x + (i * (TARGET_CARD_WIDTH + CARD_SPACING))
+            card_positions[card] = (x, y)
+
+            if card != enemy_card_in_play:
+                display_surface.blit(back_surf, (x, y))
+
+    except Exception as e:
+        print(f"Error displaying enemy hand: {e}")
+
+    return card_positions
 
 def update_battle_sequence(player, enemy, display_surface):
     """
@@ -68,6 +101,14 @@ def update_battle_sequence(player, enemy, display_surface):
     center_y = (WINDOW_HEIGHT // 2) - (estimated_card_height // 2)
     target_pos_player = ((WINDOW_WIDTH // 2) - 120, center_y)
     target_pos_enemy = ((WINDOW_WIDTH // 2) + 40, center_y)
+
+    # Positions of discard cards
+    PADDING_X = 20
+    PADDING_Y = 180
+    player_discard_target = (WINDOW_WIDTH - TARGET_CARD_WIDTH - PADDING_X,
+                             WINDOW_HEIGHT - estimated_card_height - PADDING_Y)
+    enemy_discard_target = (PADDING_X, PADDING_Y)
+    card_back_path = 'Assets/Images/Cards/back.png'
 
     move_speed = 25
     cleanup_speed = 35
@@ -92,13 +133,17 @@ def update_battle_sequence(player, enemy, display_surface):
 
     # --- PHASE 2: ENEMY CHOOSES CARD ---
     elif Battle_mode.battle_phase == Battle_mode.PHASE_ENEMY_CHOOSE:
-        if player.card_in_play:
-            display_card(player.card_in_play, (player.card_in_play.position.x, player.card_in_play.position.y),
-                         display_surface)
-
-        has_card = Battle_mode.prepare_enemy_turn(enemy)
+        enemy_hand_positions = display_enemy_hand(enemy.hand, display_surface)
+        has_card = Battle_mode.prepare_enemy_turn(enemy, enemy_hand_positions)
 
         if has_card:
+            try:
+                back_surf = pygame.image.load(card_back_path).convert_alpha()
+                rotated_surf = pygame.transform.rotate(back_surf, 180)
+                enemy.card_in_play.graphic = pygame.transform.smoothscale(rotated_surf,
+                                                                          (TARGET_CARD_WIDTH, estimated_card_height))
+            except:
+                pass
             Battle_mode.battle_phase = Battle_mode.PHASE_ENEMY_ANIMATION
         else:
             # Enemy didn't play card
@@ -116,6 +161,7 @@ def update_battle_sequence(player, enemy, display_surface):
             display_card(card, (card.position.x, card.position.y), display_surface)
 
             if arrived:
+                card.graphic = None
                 current_time = pygame.time.get_ticks()
                 if Battle_mode.timer_start == 0:
                     Battle_mode.timer_start = current_time
@@ -130,23 +176,37 @@ def update_battle_sequence(player, enemy, display_surface):
         finished_p = True
         finished_e = True
 
-        # Move Player Card to bottom-left
+        # Move Player Card to bottom-right
         if player.card_in_play:
-            finished_p = animate_move_to(player.card_in_play, (100, WINDOW_HEIGHT + 200), cleanup_speed)
+            finished_p = animate_move_to(player.card_in_play, player_discard_target, cleanup_speed)
             display_card(player.card_in_play, (player.card_in_play.position.x, player.card_in_play.position.y),
                          display_surface)
 
             if finished_p:
+                try:
+                    discard_surf = pygame.image.load(card_back_path).convert_alpha()
+                    player.card_in_play.graphic = pygame.transform.smoothscale(discard_surf, (TARGET_CARD_WIDTH,
+                                                                                              estimated_card_height))
+                except:
+                    print("Discard image not found, keeping original graphic.")
+
                 player.discard_pile.append(player.card_in_play)
                 player.card_in_play = None
 
-        # Move Enemy Card to top-right (Discard)
+        # Move Enemy Card to top-left (Discard)
         if enemy.card_in_play:
-            finished_e = animate_move_to(enemy.card_in_play, (WINDOW_WIDTH - 100, -200), cleanup_speed)
+            finished_e = animate_move_to(enemy.card_in_play, enemy_discard_target, cleanup_speed)
             display_card(enemy.card_in_play, (enemy.card_in_play.position.x, enemy.card_in_play.position.y),
                          display_surface)
-
             if finished_e:
+                try:
+                    discard_surf = pygame.image.load(card_back_path).convert_alpha()
+                    rotated_surf = pygame.transform.rotate(discard_surf, 180)
+                    enemy.card_in_play.graphic = pygame.transform.smoothscale(rotated_surf, (TARGET_CARD_WIDTH,
+                                                                                              estimated_card_height))
+                except:
+                    print("Discard image not found, keeping original graphic.")
+
                 enemy.discard_pile.append(enemy.card_in_play)
                 enemy.card_in_play = None
 
@@ -181,3 +241,32 @@ def animate_move_to(card, target, speed):
         card.position.y += (dist_y / dist) * speed
 
     return False
+
+def display_discard_piles(player, enemy, display_surface):
+    """Draws the top card of the discard piles in the corners."""
+    if player.discard_pile:
+        last_card = player.discard_pile[-1]
+        display_card(last_card, (last_card.position.x, last_card.position.y), display_surface)
+
+    if enemy.discard_pile:
+        last_card = enemy.discard_pile[-1]
+        display_card(last_card, (last_card.position.x, last_card.position.y), display_surface)
+
+def display_battle_entities(player, enemy, display_surface):
+    """Positions and draws the player and enemy sprites on the screen."""
+    PLAYER_SCALE = 1.2
+    player_image_path = 'Assets/Images/Player/Right/0.png'
+
+    try:
+        player_battle_surf = pygame.image.load(player_image_path).convert_alpha()
+    except:
+        player_battle_surf = player.image
+
+    orig_w, orig_h = player_battle_surf.get_size()
+    scaled_player_img = pygame.transform.smoothscale(player_battle_surf,(int(orig_w * PLAYER_SCALE), int(orig_h * PLAYER_SCALE)))
+
+    battle_player_rect = scaled_player_img.get_rect(center=(60, WINDOW_HEIGHT - 260))
+    battle_enemy_rect = enemy.image.get_rect(center=(WINDOW_WIDTH - 60, WINDOW_HEIGHT - 450))
+
+    display_surface.blit(scaled_player_img, battle_player_rect)
+    display_surface.blit(enemy.image, battle_enemy_rect)

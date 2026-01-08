@@ -112,7 +112,11 @@ if __name__ == "__main__":
 
                 battle_initialized = True
 
+            display_battle_entities(player, enemy, display_surface)
+
+            display_enemy_hand(enemy.hand, display_surface, enemy.card_in_play)
             display_cards_in_hand(player.hand, display_surface)
+            display_discard_piles(player, enemy, display_surface)
 
             if Battle_mode.battle_phase != Battle_mode.PHASE_IDLE:
                 update_battle_sequence(player, enemy, display_surface)
