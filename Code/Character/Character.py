@@ -26,8 +26,9 @@ class Character(ABC):
         self.full_deck.append(card)
 
     def new_game_starting_package(self):
-        for _ in range(15):
-            self.get_new_card(0, 'NORMAL')
+        pass
+        # for _ in range(15):
+        #     self.get_new_card(0, 'NORMAL')
 
     def start_battle(self):
         self.draw_pile = self.full_deck.copy()
