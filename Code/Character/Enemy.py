@@ -49,3 +49,7 @@ class Enemy(pygame.sprite.Sprite, Character):
             return None
         chosen_card = random.choice(playable_cards)
         return chosen_card
+
+    def new_game_starting_package(self):
+        for _ in range(15):
+            self.get_new_card(0, self.school.name)
