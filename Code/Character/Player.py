@@ -92,3 +92,6 @@ class Player(pygame.sprite.Sprite, Character):
         print(f"\n--- {self.name}'s Turn ---")
         self.draw_cards(self.max_cards - len(self.hand))
 
+    def new_game_starting_package(self):
+        for _ in range(15):
+            self.get_new_card(0, 'NORMAL')
