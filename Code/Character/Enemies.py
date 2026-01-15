@@ -9,9 +9,9 @@ class Rat(Enemy):
         super().__init__(pos, groups, name, health, full_deck, tier, school)
 
         if self.school == School.MAGICAL:
-            image_path = "Assets/Images/Enemies/magic-rat.png"
+            image_path = f"Assets/Images/Enemies/magic-rat-{self.tier}.png"
         else:  # TECHNICAL
-            image_path = "Assets/Images/Enemies/tech-rat.png"
+            image_path = f"Assets/Images/Enemies/tech-rat-{self.tier}.png"
 
         try:
             self.image = pygame.image.load(image_path).convert_alpha()
@@ -49,9 +49,9 @@ class Cat(Enemy):
         super().__init__(pos, groups, name, health, full_deck, tier, school)
 
         if self.school == School.MAGICAL:
-            image_path = "Assets/Images/Enemies/magic-cat.png"
+            image_path = f"Assets/Images/Enemies/magic-cat-{self.tier}.png"
         else:  # TECHNICAL
-            image_path = "Assets/Images/Enemies/tech-cat.png"
+            image_path = f"Assets/Images/Enemies/tech-cat-{self.tier}.png"
 
         try:
             self.image = pygame.image.load(image_path).convert_alpha()
