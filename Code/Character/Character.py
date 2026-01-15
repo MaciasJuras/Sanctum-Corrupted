@@ -53,7 +53,7 @@ class Character(ABC):
             if self.draw_pile:
                 card = self.draw_pile.pop()
                 self.hand.append(card)
-                print(f"[{self.name}] drew {card.name}.")
+                print(f"[{self.name}] drew {card.name} (Tier {card.tier}).")
             else:
                 print("ERROR while drawing cards.")
 
