@@ -17,9 +17,7 @@ from Code.Map.Room_transition import *
 from Code.GameState.Battle_mode import *
 from Code.Graphics.Battle_graphic import *
 
-
-
-#function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
+# function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
 """def draw_room_name(display_surface, current_room, rooms, font_size=32):
     if current_room in rooms:
         room = rooms[current_room]
@@ -41,7 +39,7 @@ from Code.Graphics.Battle_graphic import *
 """
 
 if __name__ == "__main__":
-#--- Map load ---
+    # --- Map load ---
     pygame.init()
     display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption('Sanctum Corrupted')
@@ -68,21 +66,21 @@ if __name__ == "__main__":
     for room_pos in room_positions:
         load_room(room_pos, room_classes[room_pos], all_sprites, collision_sprites, door_sprites, rooms)
 
-#--- Player and enemy declaration
-    player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
+    # --- Player and enemy declaration
+    player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites,), collision_sprites, 'Player')
     player.new_game_starting_package()
 
-    #enemy = Cat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Cat', 100, [], 0, School.MAGICAL)
-    #enemy.new_game_starting_package()
+    # enemy = Cat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Cat', 100, [], 0, School.MAGICAL)
+    # enemy.new_game_starting_package()
 
-    #enemy2 = Cat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Cat', 100, [], 0, School.TECHNICAL)
-    #enemy2.new_game_starting_package()
+    # enemy2 = Cat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Cat', 100, [], 0, School.TECHNICAL)
+    # enemy2.new_game_starting_package()
 
-#--- Parameters for tracking game phase and mouse clicks
+    # --- Parameters for tracking game phase and mouse clicks
     battle_initialized = False
     mouse_pressed_last_frame = False
 
-#--- Game loop ---
+    # --- Game loop ---
     while running:
         dt = clock.tick() / 1000
 
@@ -93,7 +91,24 @@ if __name__ == "__main__":
         if player.in_battle:
             # --- Checking mouse and keyboard button press ---
             e_pressed_last_frame = handle_battle_exit(player, e_pressed_last_frame)
-            mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
+
+            # Track if end turn button was clicked (to avoid also clicking cards)
+            end_turn_clicked = False
+
+            # Handle End Turn button FIRST (only in MULTI_CARD_MODE)
+            if Battle_mode.MULTI_CARD_MODE:
+                mouse_pressed = pygame.mouse.get_pressed()[0]
+                if mouse_pressed and not mouse_pressed_last_frame:
+                    button_rect = get_end_turn_button_rect()
+                    if button_rect.collidepoint(pygame.mouse.get_pos()):
+                        end_turn_clicked = True
+                handle_end_turn_button(player, enemy, mouse_pressed_last_frame)
+
+            # Then handle card selection (skip if end turn was clicked)
+            if not end_turn_clicked:
+                mouse_pressed_last_frame = handle_card_selection(player, mouse_pressed_last_frame)
+            else:
+                mouse_pressed_last_frame = pygame.mouse.get_pressed()[0]
 
             # --- Background Initialization ---
             if enemy.school == School.MAGICAL:
@@ -106,14 +121,24 @@ if __name__ == "__main__":
 
             if not battle_initialized:
                 # --- Battle Initialization ---
-                enemy.start_battle()
-                enemy.draw_cards(10)
+                Battle_mode.reset_battle_state()
 
+                enemy.start_battle()
                 player.start_battle()
-                player.start_turn()
+
+                if Battle_mode.MULTI_CARD_MODE:
+                    # Multi-card mode: use turn system
+                    player.start_turn()
+                else:
+                    # Single card mode: draw initial hand, set full mana (no turn system)
+                    player.mana = player.max_mana
+                    player.current_max_mana = player.max_mana
+                    player.draw_cards(10)
+                    enemy.mana = enemy.max_mana
+                    enemy.current_max_mana = enemy.max_mana
+                    enemy.draw_cards(10)
 
                 # --- Reset Battle State ---
-                Battle_mode.battle_phase = Battle_mode.PHASE_IDLE
                 player.card_in_play = None
                 enemy.card_in_play = None
 
@@ -124,6 +149,11 @@ if __name__ == "__main__":
             display_enemy_hand(enemy.hand, display_surface, enemy.card_in_play)
             display_cards_in_hand(player.hand, display_surface)
             display_discard_piles(player, enemy, display_surface)
+
+            # Draw turn indicator and end turn button
+            draw_turn_indicator(display_surface, Battle_mode.is_player_turn)
+            if Battle_mode.MULTI_CARD_MODE:
+                draw_end_turn_button(display_surface, Battle_mode.is_player_turn)
 
             if Battle_mode.battle_phase != Battle_mode.PHASE_IDLE:
                 update_battle_sequence(player, enemy, display_surface)
@@ -139,7 +169,8 @@ if __name__ == "__main__":
             if found_enemy:
                 enemy = found_enemy
 
-            current_room, e_pressed_last_frame = handle_door_interaction(door_sprites,  current_room,  player,  rooms,  e_pressed_last_frame)
+            current_room, e_pressed_last_frame = handle_door_interaction(door_sprites, current_room, player, rooms,
+                                                                         e_pressed_last_frame)
 
             enemy_sprites.empty()
 
@@ -151,7 +182,7 @@ if __name__ == "__main__":
             room_center = rooms[current_room].center
             all_sprites.custom_draw(room_center)
 
-            #draw_room_name(display_surface, current_room, rooms)
+            # draw_room_name(display_surface, current_room, rooms)
             draw_minimap(display_surface, rooms, current_room)
 
         pygame.display.update()
