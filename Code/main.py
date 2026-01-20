@@ -20,7 +20,7 @@ from Code.Graphics.Battle_graphic import *
 
 
 #function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
-def draw_room_name(display_surface, current_room, rooms, font_size=32):
+"""def draw_room_name(display_surface, current_room, rooms, font_size=32):
     if current_room in rooms:
         room = rooms[current_room]
         font = pygame.font.Font(None, font_size)
@@ -38,6 +38,7 @@ def draw_room_name(display_surface, current_room, rooms, font_size=32):
 
         text_rect = text_surf.get_rect(center=bg_rect.center)
         display_surface.blit(text_surf, text_rect)
+"""
 
 if __name__ == "__main__":
 #--- Map load ---
