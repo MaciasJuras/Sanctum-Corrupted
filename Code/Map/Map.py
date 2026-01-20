@@ -72,15 +72,13 @@ def generate_rooms(num_rooms=8, room_type_weights=None):
             ShopRoom: 0.15
         }
 
-    # --- Safety check ---
-    min_rooms = 5  # Start + Boss + Shop + at least one Monster + one Treasure
+    min_rooms = 5
     if num_rooms < min_rooms:
         raise ValueError(f"num_rooms must be at least {min_rooms}")
 
     start_pos = (0, 0)
     directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
 
-    # --- Generate connected map ---
     room_positions = [start_pos]
     while len(room_positions) < num_rooms:
         base = random.choice(room_positions)
@@ -89,7 +87,6 @@ def generate_rooms(num_rooms=8, room_type_weights=None):
         if new_pos not in room_positions:
             room_positions.append(new_pos)
 
-    # --- BFS distance from Start ---
     distances = {start_pos: 0}
     queue = deque([start_pos])
     while queue:
@@ -100,10 +97,8 @@ def generate_rooms(num_rooms=8, room_type_weights=None):
                 distances[neighbor] = distances[current] + 1
                 queue.append(neighbor)
 
-    # --- Boss = farthest from Start ---
     boss_pos = max(distances, key=distances.get)
 
-    # --- Shop = far from Start and Boss ---
     MIN_SHOP_DISTANCE_FROM_START = 3
     MIN_SHOP_DISTANCE_FROM_BOSS = 2
 
@@ -114,19 +109,16 @@ def generate_rooms(num_rooms=8, room_type_weights=None):
         and abs(pos[0] - boss_pos[0]) + abs(pos[1] - boss_pos[1]) >= MIN_SHOP_DISTANCE_FROM_BOSS
     ]
     if not shop_candidates:
-        # fallback if map too small
         shop_candidates = [pos for pos in room_positions if pos != start_pos and pos != boss_pos]
 
     shop_pos = random.choice(shop_candidates)
 
-    # --- Assign fixed rooms ---
     room_classes = {
         start_pos: StartRoom,
         boss_pos: BossRoom,
         shop_pos: ShopRoom
     }
 
-    # --- Assign room types using weights to all remaining positions ---
     remaining_positions = [pos for pos in room_positions if pos not in room_classes]
     weighted_types = list(room_type_weights.keys())
     weights = list(room_type_weights.values())
