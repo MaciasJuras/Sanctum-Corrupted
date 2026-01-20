@@ -11,6 +11,7 @@ from Code.Character.Enemy import *
 from Code.Character.Enemies import *
 from Code.Settings import *
 from Code.Graphics.Groups import AllSprites
+from Code.Map.Map import StartRoom, MonsterRoom, TreasureRoom, ShopRoom, BossRoom
 from Code.Map.Map import generate_rooms, load_room, draw_minimap
 from Code.Map.Room_transition import *
 from Code.GameState.Battle_mode import *
@@ -18,9 +19,8 @@ from Code.Graphics.Battle_graphic import *
 
 
 
-
-""" #function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
-def draw_room_name(display_surface, current_room, rooms, font_size=32):
+#function to see type of the room (UNCOMMENT: draw_room_name(display_surface, current_room, rooms))
+"""def draw_room_name(display_surface, current_room, rooms, font_size=32):
     if current_room in rooms:
         room = rooms[current_room]
         font = pygame.font.Font(None, font_size)
@@ -57,7 +57,14 @@ if __name__ == "__main__":
     current_room = (0, 0)
     e_pressed_last_frame = False
 
-    room_positions, room_classes = generate_rooms()
+    room_positions, room_classes = generate_rooms(
+        num_rooms=10,
+        room_type_weights={
+            MonsterRoom: 0.7,
+            TreasureRoom: 0.25,
+            ShopRoom: 0.05
+        }
+    )
     for room_pos in room_positions:
         load_room(room_pos, room_classes[room_pos], all_sprites, collision_sprites, door_sprites, rooms)
 
@@ -65,11 +72,11 @@ if __name__ == "__main__":
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites, ), collision_sprites, 'Player')
     player.new_game_starting_package()
 
-    enemy = Cat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Cat', 100, [], 0, School.MAGICAL)
-    enemy.new_game_starting_package()
+    #enemy = Cat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Cat', 100, [], 0, School.MAGICAL)
+    #enemy.new_game_starting_package()
 
-    enemy2 = Cat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Cat', 100, [], 0, School.TECHNICAL)
-    enemy2.new_game_starting_package()
+    #enemy2 = Cat((250, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Tech Cat', 100, [], 0, School.TECHNICAL)
+    #enemy2.new_game_starting_package()
 
 #--- Parameters for tracking game phase and mouse clicks
     battle_initialized = False
@@ -134,11 +141,17 @@ if __name__ == "__main__":
 
             current_room, e_pressed_last_frame = handle_door_interaction(door_sprites,  current_room,  player,  rooms,  e_pressed_last_frame)
 
+            enemy_sprites.empty()
+
+            room_obj = rooms[current_room]
+            if isinstance(room_obj, MonsterRoom) and not room_obj.cleared:
+                enemy_sprites.add(room_obj.enemy)
+
             display_surface.fill('black')
             room_center = rooms[current_room].center
             all_sprites.custom_draw(room_center)
 
-            # draw_room_name(display_surface, current_room, rooms)
+            draw_room_name(display_surface, current_room, rooms)
             draw_minimap(display_surface, rooms, current_room)
 
         pygame.display.update()
