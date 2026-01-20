@@ -151,7 +151,7 @@ if __name__ == "__main__":
             room_center = rooms[current_room].center
             all_sprites.custom_draw(room_center)
 
-            draw_room_name(display_surface, current_room, rooms)
+            #draw_room_name(display_surface, current_room, rooms)
             draw_minimap(display_surface, rooms, current_room)
 
         pygame.display.update()
