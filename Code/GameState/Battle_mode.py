@@ -2,15 +2,32 @@ import pygame
 
 from Code.Graphics.Battle_graphic import *
 
+# =============================================================================
+# FEATURE TOGGLE - Set to False to revert to single-card-per-turn behavior
+# =============================================================================
+MULTI_CARD_MODE = True  # True = play multiple cards per turn, False = one card then enemy responds
+
 # --- Battle State Constants ---
-PHASE_IDLE = 0
-PHASE_PLAYER_ANIMATION = 1    # Player card moving to center
-PHASE_ENEMY_CHOOSE = 2   # Logic step: Enemy picks card
-PHASE_ENEMY_ANIMATION = 3     # Enemy card moving to center
-PHASE_CLEANUP = 4        # Both cards moving to discard piles
+PHASE_IDLE = 0  # Waiting for player input
+PHASE_PLAYER_ANIMATION = 1  # Player card moving to center
+PHASE_PLAYER_CARD_RESOLVE = 2  # Player card effect resolving
+PHASE_ENEMY_TURN_START = 3  # Enemy turn begins (draw cards, refill mana)
+PHASE_ENEMY_CHOOSE = 4  # Enemy picks a card to play
+PHASE_ENEMY_ANIMATION = 5  # Enemy card moving to center
+PHASE_ENEMY_CARD_RESOLVE = 6  # Enemy card effect resolving
+PHASE_CLEANUP = 7  # Cards moving to discard piles
+PHASE_PLAYER_TURN_START = 8  # Player turn begins
 
 battle_phase = PHASE_IDLE
-timer_start = 0     # To manipulate time in battle
+timer_start = 0  # To manipulate time in battle
+
+# Track whose turn it is
+is_player_turn = True
+
+# Track cards played this turn for cleanup
+player_cards_to_discard = []
+enemy_cards_to_discard = []
+
 
 def handle_enemy_interaction(enemy_sprites, player):
     """ Checks for SPACE key press and direct collision with an enemy
@@ -45,8 +62,12 @@ def handle_card_selection(player, mouse_pressed_last_frame):
     Detects if the player clicked on a card in their hand.
     Returns the new state of the mouse button (to prevent multi-clicks).
     """
-    global battle_phase
+    global battle_phase, is_player_turn
     mouse_pressed = pygame.mouse.get_pressed()[0]
+
+    # Only allow card selection during player's turn in IDLE phase
+    if not is_player_turn:
+        return mouse_pressed
 
     if mouse_pressed and not mouse_pressed_last_frame and battle_phase == PHASE_IDLE:
         mouse_pos = pygame.mouse.get_pos()
@@ -72,11 +93,56 @@ def handle_card_selection(player, mouse_pressed_last_frame):
     return mouse_pressed
 
 
-# --- BATTLE LOGIC (Called by Graphics/Battle_graphic) ---
+def handle_end_turn_button(player, enemy, mouse_pressed_last_frame):
+    """
+    Handles clicking the End Turn button.
+    Returns the new mouse state.
+    """
+    global battle_phase, is_player_turn
+    mouse_pressed = pygame.mouse.get_pressed()[0]
+
+    # Only check during player's idle phase
+    if not is_player_turn or battle_phase != PHASE_IDLE:
+        return mouse_pressed
+
+    if mouse_pressed and not mouse_pressed_last_frame:
+        mouse_pos = pygame.mouse.get_pos()
+        button_rect = get_end_turn_button_rect()
+
+        if button_rect.collidepoint(mouse_pos):
+            print("=== Player ends turn ===")
+            # Discard remaining hand
+            player.end_turn()
+
+            # Switch to enemy turn
+            is_player_turn = False
+            battle_phase = PHASE_ENEMY_TURN_START
+
+    return mouse_pressed
+
+
+def start_player_turn(player):
+    """Initialize player's turn - draw cards, refill mana."""
+    global battle_phase, is_player_turn
+    is_player_turn = True
+    player.start_turn()
+    battle_phase = PHASE_IDLE
+    print(f"[{player.name}] Health: {player.health}/{player.max_health}")
+
+
+def start_enemy_turn(enemy):
+    """Initialize enemy's turn - draw cards, refill mana."""
+    global battle_phase
+    enemy.start_turn()
+    battle_phase = PHASE_ENEMY_CHOOSE
+    print(f"[{enemy.name}] Health: {enemy.health}/{enemy.max_health}")
+
+
+# --- BATTLE LOGIC ---
 
 def apply_player_effect(player, enemy):
     """Called when player card hits the center."""
-    global battle_phase
+    global battle_phase, player_cards_to_discard
     if player.card_in_play:
         print(f"Player effect: {player.card_in_play.name}")
         player.card_in_play.play([player, enemy])
@@ -86,13 +152,20 @@ def apply_player_effect(player, enemy):
             player.in_battle = False
             enemy.kill()
             battle_phase = PHASE_IDLE
-            return
+            return True  # Battle ended
 
-        player.draw_cards(1)
+        # Track card for discard
+        player_cards_to_discard.append(player.card_in_play)
+
+        # In single card mode, draw 1 card after playing
+        if not MULTI_CARD_MODE:
+            player.draw_cards(1)
+
+    return False  # Battle continues
 
 
-def prepare_enemy_turn(enemy, enemy_hand_positions):
-    """Called after player effect. Enemy picks a card."""
+def prepare_enemy_card(enemy, enemy_hand_positions):
+    """Called when enemy needs to pick a card. Returns True if enemy played a card."""
     enemy_card = enemy.choose_card_to_play()
 
     if enemy_card:
@@ -101,7 +174,7 @@ def prepare_enemy_turn(enemy, enemy_hand_positions):
             enemy.mana -= enemy_card.mana_cost
             print(f"Enemy mana = {enemy.mana}")
 
-        if enemy_card in enemy_hand_positions:
+        if enemy_hand_positions and enemy_card in enemy_hand_positions:
             start_x, start_y = enemy_hand_positions[enemy_card]
         else:
             start_x, start_y = (WINDOW_WIDTH // 2, 0)
@@ -110,12 +183,12 @@ def prepare_enemy_turn(enemy, enemy_hand_positions):
         enemy.card_in_play.position = pygame.Rect(start_x, start_y, TARGET_CARD_WIDTH, int(TARGET_CARD_WIDTH * 1.4))
 
         return True  # Enemy played a card
-    return False  # Enemy passed turn
+    return False  # Enemy passed turn (no playable cards)
 
 
 def apply_enemy_effect(player, enemy):
     """Called when enemy card hits the center."""
-    global battle_phase
+    global battle_phase, enemy_cards_to_discard
     if enemy.card_in_play:
         print(f"Enemy effect: {enemy.card_in_play.name}")
         enemy.card_in_play.play([enemy, player])
@@ -124,6 +197,23 @@ def apply_enemy_effect(player, enemy):
             player.end_battle(False)
             player.in_battle = False
             battle_phase = PHASE_IDLE
-            return
+            return True  # Battle ended
 
-        enemy.draw_cards(1)
+        # Track card for discard
+        enemy_cards_to_discard.append(enemy.card_in_play)
+
+        # In single card mode, enemy draws 1 card after playing
+        if not MULTI_CARD_MODE:
+            enemy.draw_cards(1)
+
+    return False  # Battle continues
+
+
+def reset_battle_state():
+    """Reset battle state for a new battle."""
+    global battle_phase, is_player_turn, player_cards_to_discard, enemy_cards_to_discard, timer_start
+    battle_phase = PHASE_IDLE
+    is_player_turn = True
+    player_cards_to_discard = []
+    enemy_cards_to_discard = []
+    timer_start = 0

@@ -1,40 +1,37 @@
 import random
 import pygame
-
 from Code.Character.Enemy import Enemy
 from Code.Cards.Card import *
 
+
 class Rat(Enemy):
     def __init__(self, pos, groups, name, health, full_deck: list[Card], tier, school: School = School.MAGICAL):
-        super().__init__(pos, groups, name, health, full_deck, tier, school)
+        # Calculate actual health based on tier (ignore passed health parameter)
+        actual_health = self._calculate_health(tier)
+        super().__init__(pos, groups, name, actual_health, full_deck, tier, school)
 
         if self.school == School.MAGICAL:
             image_path = f"Assets/Images/Enemies/magic-rat-{self.tier}.png"
         else:  # TECHNICAL
             image_path = f"Assets/Images/Enemies/tech-rat-{self.tier}.png"
-
         try:
             self.image = pygame.image.load(image_path).convert_alpha()
         except pygame.error:
             # Fallback if image path is bad
             self.image = pygame.Surface((64, 64))
             self.image.fill((0, 0, 255))
-
         self.rect = self.image.get_frect(center=pos)
 
+    def _calculate_health(self, tier: int) -> int:
+        # Rat health: 10 -> 20 -> 30 (weaker enemy)
+        return 10 + (tier * 10)
+
     def get_max_health(self, tier: int) -> int:
-        if self.school == School.TECHNICAL:
-            health = 5 + (tier * 2)
-        else:
-            health = 7 + (tier * 3)
-        return health
+        return self._calculate_health(tier)
 
     def get_max_mana(self, tier: int) -> int:
-        if self.school == School.MAGICAL:
-            max_mana = 5 + (tier * 2)
-        else:
-            max_mana = 7 + (tier * 3)
-        return max_mana
+        # Rat mana: 3 -> 4 -> 5
+        return 3 + tier
 
     def get_name(self, tier: int) -> str:
         if self.school == School.MAGICAL:
@@ -46,35 +43,32 @@ class Rat(Enemy):
 
 class Cat(Enemy):
     def __init__(self, pos, groups, name, health, full_deck: list[Card], tier, school: School = School.MAGICAL):
-        super().__init__(pos, groups, name, health, full_deck, tier, school)
+        # Calculate actual health based on tier (ignore passed health parameter)
+        actual_health = self._calculate_health(tier)
+        super().__init__(pos, groups, name, actual_health, full_deck, tier, school)
 
         if self.school == School.MAGICAL:
             image_path = f"Assets/Images/Enemies/magic-cat-{self.tier}.png"
         else:  # TECHNICAL
             image_path = f"Assets/Images/Enemies/tech-cat-{self.tier}.png"
-
         try:
             self.image = pygame.image.load(image_path).convert_alpha()
         except pygame.error:
             # Fallback if image path is bad
             self.image = pygame.Surface((64, 64))
             self.image.fill((0, 0, 255))
-
         self.rect = self.image.get_frect(center=pos)
 
+    def _calculate_health(self, tier: int) -> int:
+        # Cat health: 15 -> 27 -> 40 (stronger enemy)
+        return 15 + (tier * 12) + (1 if tier == 2 else 0)
+
     def get_max_health(self, tier: int) -> int:
-        if self.school == School.TECHNICAL:
-            health = 7 + (tier * 2)
-        else:
-            health = 9 + (tier * 3)
-        return health
+        return self._calculate_health(tier)
 
     def get_max_mana(self, tier: int) -> int:
-        if self.school == School.MAGICAL:
-            max_mana = 7 + (tier * 2)
-        else:
-            max_mana = 9 + (tier * 3)
-        return max_mana
+        # Cat mana: 4 -> 5 -> 6
+        return 4 + tier
 
     def get_name(self, tier: int) -> str:
         if self.school == School.MAGICAL:

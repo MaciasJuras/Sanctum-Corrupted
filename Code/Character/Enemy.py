@@ -1,7 +1,7 @@
 import random
 import pygame
 
-from Code.Character.Character import Character
+from Code.Character.Character import Character, STARTING_MAX_MANA
 from Code.Cards.Card import *
 
 class Enemy(pygame.sprite.Sprite, Character):
@@ -16,7 +16,8 @@ class Enemy(pygame.sprite.Sprite, Character):
         self.school = school
 
         self.max_mana = self.get_max_mana(tier)
-        self.mana = self.max_mana
+        self.mana = STARTING_MAX_MANA
+        self.current_max_mana = STARTING_MAX_MANA
 
         self.image = pygame.Surface((64, 64))  # Placeholder size
         self.image.fill((100, 100, 100))  # Generic gray placeholder
@@ -36,11 +37,6 @@ class Enemy(pygame.sprite.Sprite, Character):
     def get_name(self, tier: int) -> str:
         pass
 
-    def start_turn(self):
-        print(f"\n--- {self.name}'s Turn ---")
-        self.draw_cards(self.max_cards - len(self.hand))
-        print(f"[{self.name}] Health: {self.health}/{self.max_health}")
-
     def choose_card_to_play(self):
         #AI logic will be implemented here. For now It's just random choice
         playable_cards = [card for card in self.hand if card.mana_cost <= self.mana]
@@ -49,6 +45,13 @@ class Enemy(pygame.sprite.Sprite, Character):
             return None
         chosen_card = random.choice(playable_cards)
         return chosen_card
+
+    def end_battle(self, win):
+        """Enemy health resets since they're fresh each encounter."""
+        self.current_max_mana = STARTING_MAX_MANA
+        self.mana = 0
+        self.turn_number = 0
+        self.health = self.max_health  # Enemies reset health
 
     def new_game_starting_package(self):
         match self.tier:
