@@ -68,7 +68,6 @@ if __name__ == "__main__":
 
     # --- Player and enemy declaration
     player = Player((WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), (all_sprites,), collision_sprites, 'Player')
-    player.new_game_starting_package()
 
     # enemy = Cat((850, WINDOW_HEIGHT // 2), (all_sprites, enemy_sprites), 'Magic Cat', 100, [], 0, School.MAGICAL)
     # enemy.new_game_starting_package()
@@ -124,7 +123,7 @@ if __name__ == "__main__":
                 Battle_mode.reset_battle_state()
 
                 enemy.start_battle()
-                player.start_battle()
+                player.start_battle(enemy)
 
                 if Battle_mode.MULTI_CARD_MODE:
                     # Multi-card mode: use turn system
