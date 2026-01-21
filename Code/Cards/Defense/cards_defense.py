@@ -3,9 +3,10 @@ from ..Card import Card, School, CardModifier, EffectTiming
 
 class ShieldUp(Card):
     """Basic defense card"""
+
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
-    
+
     def get_base_cost(self, tier: int) -> int:
         if self.school == School.MAGICAL:
             return 1
@@ -13,7 +14,7 @@ class ShieldUp(Card):
             return 1
         else:
             return 2
-    
+
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
             names = {0: "Shield Up", 1: "Shield Wall", 2: "Fortress"}
@@ -35,7 +36,7 @@ class ShieldUp(Card):
             defense = 4 + (tier * 4)
         else:
             defense = 3 + (tier * 3)
-        
+
         game_state[0].add_block(defense)
 
     def get_image_path(self) -> str:
@@ -47,15 +48,16 @@ class ShieldUp(Card):
 
 class Dodge(Card):
     """Avoid next attack"""
+
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
-    
+
     def get_base_cost(self, tier: int) -> int:
         if self.school == School.MAGICAL:
             return 0 if tier >= 1 else 1
         else:
             return 1
-    
+
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
             names = {0: "Dodge", 1: "Evasion", 2: "Phase Shift"}
@@ -67,7 +69,7 @@ class Dodge(Card):
 
     def get_effect_value(self, tier: int) -> int:
         return 1 + tier
-    
+
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
             game_state[0].add_dodge(1 + tier)
@@ -84,15 +86,16 @@ class Dodge(Card):
 
 class ArmorUp(Card):
     """Permanent damage reduction"""
+
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
-    
+
     def get_base_cost(self, tier: int) -> int:
         if self.school == School.MAGICAL:
             return 1
         else:
             return 2
-    
+
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
             names = {0: "Armor Up", 1: "Fortify", 2: "Iron Skin"}
@@ -108,13 +111,13 @@ class ArmorUp(Card):
         else:
             armor = 1 + (tier * 1)
         return armor
-    
+
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
             armor = 2 + (tier * 2)
         else:
             armor = 1 + (tier * 1)
-        
+
         game_state[0].add_armor(armor)
 
     def get_image_path(self) -> str:
@@ -126,15 +129,16 @@ class ArmorUp(Card):
 
 class CounterAttack(Card):
     """Damage enemy when hit"""
+
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
-    
+
     def get_base_cost(self, tier: int) -> int:
         if self.school == School.MAGICAL:
             return 1
         else:
             return 2
-    
+
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
             names = {0: "Counter Attack", 1: "Riposte", 2: "Perfect Counter"}
@@ -150,7 +154,7 @@ class CounterAttack(Card):
         else:
             damage = 3 + (tier * 2)
         return damage
-    
+
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
             damage = 4 + (tier * 3)
@@ -158,7 +162,7 @@ class CounterAttack(Card):
         else:
             damage = 3 + (tier * 2)
             stacks = 1
-        
+
         game_state[0].add_thorns(damage, stacks)
 
     def get_image_path(self) -> str:
@@ -169,38 +173,37 @@ class CounterAttack(Card):
 
 
 class Regeneration(Card):
-    """Heal over time"""
+    """Instant heal (Bandages)"""
+
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
-    
+
     def get_base_cost(self, tier: int) -> int:
         return 1
-    
+
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
-            names = {0: "Bandages", 1: "First Aid", 2: "Full recovery"}
+            names = {0: "Bandages", 1: "First Aid", 2: "Full Recovery"}
         elif self.school == School.MAGICAL:
             names = {0: "Runic Wrap", 1: "Spirit Thread", 2: "Blessed Cloth"}
         else:  # TECHNICAL
             names = {0: "Med Kit", 1: "Auto-Repair", 2: "Systemic Repair"}
-        return names.get(tier, f"Regeneration +{tier}")
+        return names.get(tier, f"Bandages +{tier}")
 
     def get_effect_value(self, tier: int) -> int:
         if self.school == School.TECHNICAL:
-            heal_per_turn = 3 + (tier * 2)
+            heal = 4 + (tier * 3)
         else:
-            heal_per_turn = 2 + (tier * 1)
-        return heal_per_turn
-    
+            heal = 3 + (tier * 2)
+        return heal
+
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
-            heal_per_turn = 3 + (tier * 2)
-            duration = 3 + tier
+            heal = 4 + (tier * 3)
         else:
-            heal_per_turn = 2 + (tier * 1)
-            duration = 3
-        
-        game_state[0].add_regeneration(heal_per_turn, duration)
+            heal = 3 + (tier * 2)
+
+        game_state[0].heal(heal)
 
     def get_image_path(self) -> str:
         if self.school == School.NORMAL: return 'Assets/Images/Cards/Heal/card-bandages-normal.png'
@@ -211,15 +214,16 @@ class Regeneration(Card):
 
 class Heal(Card):
     """Immediate healing"""
+
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
-    
+
     def get_base_cost(self, tier: int) -> int:
         if self.school == School.MAGICAL:
             return 1
         else:
             return 2
-    
+
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
             names = {0: "Health Potion", 1: "Revitalizing Brew", 2: "Panacea"}
@@ -236,13 +240,13 @@ class Heal(Card):
             heal = 5 + (tier * 3)
 
         return heal
-    
+
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
             heal = 6 + (tier * 4)
         else:
             heal = 5 + (tier * 3)
-        
+
         game_state[0].heal(heal)
 
     def get_image_path(self) -> str:
@@ -254,15 +258,16 @@ class Heal(Card):
 
 class Parry(Card):
     """Block and counter"""
+
     def __init__(self, card_id: int, tier: int = 0, school: School = School.NORMAL):
         super().__init__(card_id, tier, school)
-    
+
     def get_base_cost(self, tier: int) -> int:
         if self.school == School.MAGICAL:
             return 1
         else:
             return 2
-    
+
     def get_name(self, tier: int) -> str:
         if self.school == School.NORMAL:
             names = {0: "Parry", 1: "Perfect Parry", 2: "Master's Parry"}
@@ -278,7 +283,7 @@ class Parry(Card):
         else:
             block = 3 + (tier * 2)
         return block
-    
+
     def effect(self, game_state, tier: int):
         if self.school == School.TECHNICAL:
             block = 4 + (tier * 2)
@@ -286,7 +291,7 @@ class Parry(Card):
         else:
             block = 3 + (tier * 2)
             damage = 2 + (tier * 1)
-        
+
         game_state[0].add_block(block)
         game_state[0].add_next_attack_counter(damage)
 

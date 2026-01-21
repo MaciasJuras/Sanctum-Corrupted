@@ -32,6 +32,15 @@ class Character(ABC):
         self.current_max_mana = STARTING_MAX_MANA  # Grows each turn
         self.turn_number = 0
 
+        # Defensive stats
+        self.block = 0  # Temporary shield, absorbs damage before health, resets each turn
+        self.dodge = 0  # Number of attacks that can be completely avoided
+        self.dodge_triggered = False  # Flag for UI to show "Dodged!" text
+
+        # Status effects
+        self.regeneration = []  # List of (heal_amount, remaining_turns)
+        self.thorns = []  # List of (damage, remaining_stacks)
+
     def get_new_card(self, tier, school_name):
         school_enum = School[school_name]
         card = create_card(get_random_card_ids(1)[0], tier, school_enum)
@@ -53,6 +62,14 @@ class Character(ABC):
         self.turn_number = 0
         self.current_max_mana = STARTING_MAX_MANA
         self.mana = 0
+
+        # Reset defensive stats for new battle
+        self.block = 0
+        self.dodge = 0
+        self.dodge_triggered = False
+        self.regeneration = []
+        self.thorns = []
+
         print(f"{self.name} prepares for battle")
 
     def draw_cards(self, amount: int):
@@ -101,8 +118,35 @@ class Character(ABC):
         print(f"\n--- {self.name}'s Turn {self.turn_number} ---")
         print(f"[{self.name}] Mana: {self.mana}/{self.current_max_mana}")
 
+        # Reset block at the start of turn (temporary shield)
+        if self.block > 0:
+            print(f"[{self.name}] Block fades: {self.block} -> 0")
+            self.block = 0
+
+        # Apply regeneration effects
+        self._apply_regeneration()
+
         # Draw cards for this turn
         self.draw_cards(CARDS_PER_TURN)
+
+    def _apply_regeneration(self):
+        """Apply all active regeneration effects and decrement their duration."""
+        if not self.regeneration:
+            return
+
+        total_heal = 0
+        remaining_regen = []
+
+        for heal_amount, duration in self.regeneration:
+            total_heal += heal_amount
+            if duration > 1:
+                remaining_regen.append((heal_amount, duration - 1))
+
+        self.regeneration = remaining_regen
+
+        if total_heal > 0:
+            self.heal(total_heal)
+            print(f"[{self.name}] Regeneration heals for {total_heal}!")
 
     def end_turn(self):
         """Called at the end of each turn. Discards entire hand."""
@@ -125,15 +169,39 @@ class Character(ABC):
 
     # --- Combat / Damage Cards effects ---
     def deal_damage(self, damage: int, ignore_armor: bool = False):
+        """
+        Takes damage, applying defensive mechanics in order:
+        1. Dodge - 20% chance to completely avoid the attack (consumed when triggered)
+        2. Block - absorbs damage before health (temporary shield, resets each turn)
+        3. Health - remaining damage hits HP
+        """
+        # Check for dodge (20% chance to avoid if active)
+        if self.dodge > 0:
+            if random.random() < 0.2:  # 20% chance
+                self.dodge = 0  # Consume dodge when it triggers
+                self.dodge_triggered = True  # Flag for UI to show "Dodged!" text
+                print(f"[{self.name}] dodged the attack! (20% chance triggered)")
+                return  # Attack completely avoided
+
+        # Apply block (temporary shield)
+        if self.block > 0:
+            if self.block >= damage:
+                self.block -= damage
+                print(f"[{self.name}] block absorbs all damage! ({self.block} block remaining)")
+                return  # All damage blocked
+            else:
+                damage -= self.block
+                print(f"[{self.name}] block absorbs {self.block} damage, {damage} goes through")
+                self.block = 0
+
+        # Apply remaining damage to health
         self.health -= damage
         if self.health <= 0:
             self.health = 0
             print(f"[{self.name}] takes {damage} damage, 0 HP remaining.")
-            print(f"[{self.name}] lose")
+            print(f"[{self.name}] has been defeated!")
         else:
             print(f"[{self.name}] takes {damage} damage, {self.health} HP remaining.")
-        print(f"{self.name} took {damage} damage (Ignore Armor: {ignore_armor})")
-        pass
 
     def deal_damage_aoe(self, damage: int):
         """
@@ -174,14 +242,16 @@ class Character(ABC):
 
     def add_block(self, amount: int):
         """Used by ShieldUp, Parry, Dodge, etc."""
-        # You likely need a self.block variable in __init__ later
-        print(f"[{self.name}] gained {amount} Block.")
-        pass
+        self.block += amount
+        print(f"[{self.name}] gained {amount} Block. (Total: {self.block})")
 
     def add_dodge(self, amount: int):
-        """Used by Dodge"""
-        print(f"[{self.name}] gained {amount} Dodge.")
-        pass
+        """Used by Dodge - max 1 instance, gives 20% chance to avoid damage"""
+        if self.dodge == 0:
+            self.dodge = 1
+            print(f"[{self.name}] gained Dodge! (20% chance to avoid attacks)")
+        else:
+            print(f"[{self.name}] already has Dodge active.")
 
     def add_armor(self, amount: int):
         """Used by ArmorUp"""
@@ -190,13 +260,13 @@ class Character(ABC):
 
     def add_thorns(self, damage: int, stacks: int):
         """Used by CounterAttack"""
+        self.thorns.append((damage, stacks))
         print(f"[{self.name}] gained {damage} Thorns ({stacks} stacks).")
-        pass
 
     def add_regeneration(self, heal_amount: int, duration: int):
         """Used by Regeneration"""
+        self.regeneration.append((heal_amount, duration))
         print(f"[{self.name}] gained Regeneration: {heal_amount} HP for {duration} turns.")
-        pass
 
     # --- Deck / Hand Manipulation Cards effects ---
 

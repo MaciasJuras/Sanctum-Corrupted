@@ -15,6 +15,11 @@ ENEMY_PHASE_DELAY = 1000  # 1 second
 END_TURN_BUTTON_WIDTH = 120
 END_TURN_BUTTON_HEIGHT = 40
 
+# Dodge text display tracking
+dodge_text_start_time = 0
+dodge_text_duration = 800  # Show "Dodged!" for 800ms
+show_dodge_text = False
+
 
 def get_end_turn_button_rect():
     """Returns the rect for the End Turn button."""
@@ -77,6 +82,58 @@ def draw_turn_indicator(display_surface, is_player_turn):
     pygame.draw.rect(bg_surface, (0, 0, 0, 180), bg_surface.get_rect(), border_radius=8)
     display_surface.blit(bg_surface, bg_rect)
 
+    display_surface.blit(text_surf, text_rect)
+
+
+def check_and_draw_dodge_text(display_surface, player, enemy):
+    """Check if dodge was triggered and display 'Dodged!' text."""
+    global show_dodge_text, dodge_text_start_time
+
+    current_time = pygame.time.get_ticks()
+
+    # Check if player just dodged (only trigger new text if not already showing)
+    if getattr(player, 'dodge_triggered', False):
+        player.dodge_triggered = False
+        show_dodge_text = True
+        dodge_text_start_time = current_time
+
+    # Check if enemy just dodged
+    if getattr(enemy, 'dodge_triggered', False):
+        enemy.dodge_triggered = False
+        show_dodge_text = True
+        dodge_text_start_time = current_time
+
+    # Draw the dodge text if active and within duration
+    if show_dodge_text:
+        elapsed = current_time - dodge_text_start_time
+        if elapsed < dodge_text_duration:
+            draw_dodge_text(display_surface)
+        else:
+            show_dodge_text = False
+
+
+def draw_dodge_text(display_surface):
+    """Draws 'DODGED!' text in the center of the screen."""
+    font_path = 'Assets/Font/Jersey10.ttf'
+    try:
+        font = pygame.font.Font(font_path, 48)
+    except:
+        font = pygame.font.Font(None, 48)
+
+    # Yellow/gold color for dodge
+    text_color = (255, 220, 50)
+    shadow_color = (100, 80, 0)
+
+    text = "DODGED!"
+
+    # Draw shadow
+    shadow_surf = font.render(text, True, shadow_color)
+    shadow_rect = shadow_surf.get_rect(center=(WINDOW_WIDTH // 2 + 2, WINDOW_HEIGHT // 2 + 2))
+    display_surface.blit(shadow_surf, shadow_rect)
+
+    # Draw main text
+    text_surf = font.render(text, True, text_color)
+    text_rect = text_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
     display_surface.blit(text_surf, text_rect)
 
 
@@ -432,15 +489,23 @@ def display_stat_bars(player, enemy, display_surface):
     player_label = font.render(player.name, True, TEXT_COLOR)
     display_surface.blit(player_label, (player_x, player_y - 30))
 
-    # Player Health Bar
+    # Player Health Bar (with green border if dodge is active)
+    player_has_dodge = getattr(player, 'dodge', 0) > 0
     draw_stat_bar(
         display_surface, player_x, player_y,
         BAR_WIDTH, BAR_HEIGHT,
         player.health, player.max_health,
-        HEALTH_COLOR, HEALTH_BG, BORDER_COLOR, BORDER_RADIUS
+        HEALTH_COLOR, HEALTH_BG, BORDER_COLOR, BORDER_RADIUS,
+        highlight_border=(100, 220, 100) if player_has_dodge else None
     )
     health_text = font_small.render(f"HP: {player.health}/{player.max_health}", True, TEXT_COLOR)
     display_surface.blit(health_text, (player_x + BAR_WIDTH + 10, player_y + 2))
+
+    # Player Block Indicator (shield icon next to health)
+    player_block = getattr(player, 'block', 0)
+    if player_block > 0:
+        block_x = player_x + BAR_WIDTH + 80
+        draw_block_indicator(display_surface, block_x, player_y, player_block, font_small)
 
     # Player Mana Bar
     mana_y = player_y + BAR_HEIGHT + BAR_SPACING
@@ -462,16 +527,24 @@ def display_stat_bars(player, enemy, display_surface):
     enemy_label_rect = enemy_label.get_rect(right=WINDOW_WIDTH - 20, top=enemy_y - 30)
     display_surface.blit(enemy_label, enemy_label_rect)
 
-    # Enemy Health Bar
+    # Enemy Health Bar (with green border if dodge is active)
+    enemy_has_dodge = getattr(enemy, 'dodge', 0) > 0
     draw_stat_bar(
         display_surface, enemy_x, enemy_y,
         BAR_WIDTH, BAR_HEIGHT,
         enemy.health, enemy.max_health,
-        HEALTH_COLOR, HEALTH_BG, BORDER_COLOR, BORDER_RADIUS
+        HEALTH_COLOR, HEALTH_BG, BORDER_COLOR, BORDER_RADIUS,
+        highlight_border=(100, 220, 100) if enemy_has_dodge else None
     )
     enemy_health_text = font_small.render(f"HP: {enemy.health}/{enemy.max_health}", True, TEXT_COLOR)
     enemy_health_rect = enemy_health_text.get_rect(right=enemy_x - 10, top=enemy_y + 2)
     display_surface.blit(enemy_health_text, enemy_health_rect)
+
+    # Enemy Block Indicator
+    enemy_block = getattr(enemy, 'block', 0)
+    if enemy_block > 0:
+        block_x = enemy_x - 70
+        draw_block_indicator(display_surface, block_x, enemy_y, enemy_block, font_small)
 
     # Enemy Mana Bar
     enemy_mana_y = enemy_y + BAR_HEIGHT + BAR_SPACING
@@ -486,8 +559,9 @@ def display_stat_bars(player, enemy, display_surface):
     display_surface.blit(enemy_mana_text, enemy_mana_rect)
 
 
-def draw_stat_bar(surface, x, y, width, height, current, maximum, fill_color, bg_color, border_color, border_radius):
-    """Draws a single stat bar with background, fill, and border."""
+def draw_stat_bar(surface, x, y, width, height, current, maximum, fill_color, bg_color, border_color, border_radius,
+                  highlight_border=None):
+    """Draws a single stat bar with background, fill, and border. Optional highlight_border for dodge effect."""
     # Background
     bg_rect = pygame.Rect(x, y, width, height)
     pygame.draw.rect(surface, bg_color, bg_rect, border_radius=border_radius)
@@ -500,5 +574,33 @@ def draw_stat_bar(surface, x, y, width, height, current, maximum, fill_color, bg
             fill_rect = pygame.Rect(x, y, fill_width, height)
             pygame.draw.rect(surface, fill_color, fill_rect, border_radius=border_radius)
 
-    # Border
-    pygame.draw.rect(surface, border_color, bg_rect, width=2, border_radius=border_radius)
+    # Border - use highlight color if provided (for dodge effect)
+    if highlight_border:
+        # Draw thicker glowing border for dodge
+        pygame.draw.rect(surface, highlight_border, bg_rect, width=3, border_radius=border_radius)
+    else:
+        pygame.draw.rect(surface, border_color, bg_rect, width=2, border_radius=border_radius)
+
+
+def draw_block_indicator(surface, x, y, block_amount, font):
+    """Draws a shield-shaped block indicator with the block value."""
+    # Shield colors
+    SHIELD_COLOR = (100, 150, 220)  # Light blue
+    SHIELD_BORDER = (60, 100, 180)  # Darker blue
+    TEXT_COLOR = (255, 255, 255)
+
+    # Shield dimensions
+    shield_width = 32
+    shield_height = 36
+
+    # Draw shield shape (simplified as a rounded rectangle with pointed bottom)
+    shield_rect = pygame.Rect(x, y - 8, shield_width, shield_height)
+
+    # Draw shield background
+    pygame.draw.rect(surface, SHIELD_COLOR, shield_rect, border_radius=6)
+    pygame.draw.rect(surface, SHIELD_BORDER, shield_rect, width=2, border_radius=6)
+
+    # Draw the block value
+    block_text = font.render(str(block_amount), True, TEXT_COLOR)
+    text_rect = block_text.get_rect(center=shield_rect.center)
+    surface.blit(block_text, text_rect)
