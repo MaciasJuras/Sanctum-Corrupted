@@ -43,6 +43,9 @@ class Character(ABC):
         #     self.get_new_card(0, 'NORMAL')
 
     def start_battle(self):
+        for card in self.full_deck:
+            card.graphic = None
+            card.position = None
         self.draw_pile = self.full_deck.copy()
         random.shuffle(self.draw_pile)
         self.hand = []
@@ -62,6 +65,9 @@ class Character(ABC):
                     print(f"[{self.name}] is out of cards to draw!")
                     break
                 print(f"[{self.name}] shuffles their discard pile.")
+                for card in self.discard_pile:
+                    card.graphic = None
+                    card.position = None
                 self.draw_pile = self.discard_pile.copy()
                 self.discard_pile = []
                 random.shuffle(self.draw_pile)
