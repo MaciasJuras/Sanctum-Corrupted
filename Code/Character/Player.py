@@ -103,6 +103,24 @@ class Player(pygame.sprite.Sprite, Character):
         else:
             print("You lost!")
 
-    def new_game_starting_package(self):
-        for _ in range(15):
-            self.get_new_card(0, 'NORMAL')
+    def start_battle(self, enemy):
+        self.full_deck = []
+
+        match enemy.tier:
+            case 0:
+                for _ in range(15):
+                    self.get_new_card(0, 'NORMAL')
+            case 1:
+                for _ in range(15):
+                    self.get_new_card(0, 'NORMAL')
+                for _ in range(5):
+                    self.get_new_card(1, 'NORMAL')
+            case 2:
+                for _ in range(10):
+                    self.get_new_card(0, 'NORMAL')
+                for _ in range(5):
+                    self.get_new_card(1, 'NORMAL')
+                for _ in range(5):
+                    self.get_new_card(2, 'NORMAL')
+
+        super().start_battle()
