@@ -157,6 +157,9 @@ if __name__ == "__main__":
             if Battle_mode.battle_phase != Battle_mode.PHASE_IDLE:
                 update_battle_sequence(player, enemy, display_surface)
 
+            # Check and draw dodge text if triggered
+            check_and_draw_dodge_text(display_surface, player, enemy)
+
             if not player.in_battle:
                 battle_initialized = False
 
