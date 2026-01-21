@@ -4,37 +4,53 @@ from Code.Cards.Card import *
 from Code.Cards.card_registry import *
 from Code.Cards.card_ids import *
 
+# === BATTLE CONFIGURATION ===
+CARDS_PER_TURN = 5  # Cards drawn at start of each turn
+MAX_MANA_CAP = 5  # Maximum mana cap
+STARTING_MAX_MANA = 1  # Max mana on turn 1
+
+
 class Character(ABC):
 
-    #An abstract base class for any combatant in the game.
+    # An abstract base class for any combatant in the game.
 
     def __init__(self, name, health, full_deck: list[Card]):
         self.name = name
         self.health = health
         self.max_health = health
 
-        #Cards
+        # Cards
         self.full_deck = full_deck
         self.draw_pile = []
         self.hand = []
         self.discard_pile = []
         self.max_cards = 10
 
+        # Mana system - will be initialized in start_battle
+        self.mana = 0
+        self.max_mana = 0
+        self.current_max_mana = STARTING_MAX_MANA  # Grows each turn
+        self.turn_number = 0
+
     def get_new_card(self, tier, school_name):
         school_enum = School[school_name]
-        card = create_card(get_random_card_ids(1)[0],tier,school_enum)
+        card = create_card(get_random_card_ids(1)[0], tier, school_enum)
         self.full_deck.append(card)
 
     def new_game_starting_package(self):
-        for _ in range(15):
-            self.get_new_card(0, 'NORMAL')
+        pass
+        # for _ in range(15):
+        #     self.get_new_card(0, 'NORMAL')
 
     def start_battle(self):
         self.draw_pile = self.full_deck.copy()
         random.shuffle(self.draw_pile)
         self.hand = []
         self.discard_pile = []
-        print(f"{self.name}'prepares for battle")
+        self.turn_number = 0
+        self.current_max_mana = STARTING_MAX_MANA
+        self.mana = 0
+        print(f"{self.name} prepares for battle")
 
     def draw_cards(self, amount: int):
         for _ in range(amount):
@@ -52,7 +68,7 @@ class Character(ABC):
             if self.draw_pile:
                 card = self.draw_pile.pop()
                 self.hand.append(card)
-                print(f"[{self.name}] drew {card.name}.")
+                print(f"[{self.name}] drew {card.name} (Tier {card.tier}).")
             else:
                 print("ERROR while drawing cards.")
 
@@ -62,11 +78,35 @@ class Character(ABC):
             self.hand.remove(card)
             self.discard_pile.append(card)
         else:
-            print(f"ERROR: {card.name} was played, but it was not in the hand (Possible double-trigger in animation loop).")
+            print(
+                f"ERROR: {card.name} was played, but it was not in the hand (Possible double-trigger in animation loop).")
 
-    @abstractmethod
     def start_turn(self):
-        pass
+        """Called at the start of each turn. Increases mana cap, refills mana, draws cards."""
+        self.turn_number += 1
+
+        # Increase max mana (up to cap)
+        if self.current_max_mana < MAX_MANA_CAP:
+            self.current_max_mana = min(self.turn_number, MAX_MANA_CAP)
+
+        # Refill mana to current max
+        self.mana = self.current_max_mana
+
+        print(f"\n--- {self.name}'s Turn {self.turn_number} ---")
+        print(f"[{self.name}] Mana: {self.mana}/{self.current_max_mana}")
+
+        # Draw cards for this turn
+        self.draw_cards(CARDS_PER_TURN)
+
+    def end_turn(self):
+        """Called at the end of each turn. Discards entire hand."""
+        # Move all cards from hand to discard pile, clearing their visual state
+        for card in self.hand:
+            card.position = None  # Clear position so it doesn't draw in old location
+            card.graphic = None  # Clear graphic so it regenerates if needed
+            self.discard_pile.append(card)
+        self.hand = []
+        print(f"[{self.name}] discards hand. End of turn.")
 
     def end_battle(self, win):
         self.mana = self.max_mana
@@ -116,15 +156,15 @@ class Character(ABC):
         self.health += amount
         if self.health >= self.max_health:
             self.health = self.max_health
-        print(f"[{self.name}] heals, {amount} HP remaining.")
+        print(f"[{self.name}] heals for {amount} HP. ({self.health}/{self.max_health})")
 
     def add_mana(self, amount: int):
         """Used by ManaGain card"""
         if hasattr(self, 'mana'):
             self.mana += amount
-            if self.mana > self.max_mana:
-                self.mana = self.max_mana
-            print(f"[{self.name}] recovered {amount} Mana. ({self.mana}/{self.max_mana})")
+            if self.mana > self.current_max_mana:
+                self.mana = self.current_max_mana
+            print(f"[{self.name}] recovered {amount} Mana. ({self.mana}/{self.current_max_mana})")
 
     def add_block(self, amount: int):
         """Used by ShieldUp, Parry, Dodge, etc."""

@@ -1,7 +1,0 @@
-**/.DS_Store
-.venv/
-.idea/
-__pycache__/
-dist/
-build/
-*.egg-info/

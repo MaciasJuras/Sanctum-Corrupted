@@ -1,10 +1,10 @@
 from Code.Settings import *
-from Code.Character.Character import Character
+from Code.Character.Character import Character, STARTING_MAX_MANA
 from Code.Cards.Card import Card
 
 
 class Player(pygame.sprite.Sprite, Character):
-    def __init__(self, pos ,groups, collision_sprites, name, health = 100, mana = 50, full_deck: list[Card] = None):
+    def __init__(self, pos, groups, collision_sprites, name, health=60, mana=50, full_deck: list[Card] = None):
 
         pygame.sprite.Sprite.__init__(self, groups)
         Character.__init__(self, name, health, full_deck if full_deck else [])
@@ -14,15 +14,16 @@ class Player(pygame.sprite.Sprite, Character):
         self.load_images()
         self.state, self.frame_index = 'Down', 0
         self.image = self.frames['Down'][0]
-        self.rect = self.image.get_frect(center = pos)
+        self.rect = self.image.get_frect(center=pos)
         self.hitbox_rect = self.rect.inflate(-20, -40)
 
         self.direction = pygame.Vector2()
         self.speed = 500
         self.collision_sprites = collision_sprites
 
-        self.mana = mana
+        self.mana = STARTING_MAX_MANA
         self.max_mana = mana
+        self.current_max_mana = STARTING_MAX_MANA
 
         self.in_battle = False
         self.card_in_play = None
@@ -88,7 +89,20 @@ class Player(pygame.sprite.Sprite, Character):
         self.move(dt)
         self.animate(dt)
 
-    def start_turn(self):
-        print(f"\n--- {self.name}'s Turn ---")
-        self.draw_cards(self.max_cards - len(self.hand))
+    def end_battle(self, win):
+        """Override: Player health does NOT reset after battle to persist across encounters."""
+        # Reset mana for next battle
+        self.current_max_mana = STARTING_MAX_MANA
+        self.mana = 0
+        self.turn_number = 0
 
+        # NOTE: Health is NOT reset - player must preserve HP through encounters
+        if win:
+            print("You win!")
+            self.get_new_card(0, 'NORMAL')
+        else:
+            print("You lost!")
+
+    def new_game_starting_package(self):
+        for _ in range(15):
+            self.get_new_card(0, 'NORMAL')

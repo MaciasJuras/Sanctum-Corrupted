@@ -1,9 +1,12 @@
+from Code.Cards.Card import School
+from Code.Character.Enemies import Cat
 from Code.Settings import *
 from Code.Graphics.Sprites import *
 from pytmx.util_pygame import load_pygame
 import random
 import os
 from os.path import join
+from collections import deque
 import pygame
 
 
@@ -52,6 +55,8 @@ class BossRoom(Room):
 class MonsterRoom(Room):
     def __init__(self, position, offset, width, height):
         super().__init__(position, offset, width, height, 'monster')
+        self.enemy = None
+        self.cleared = False
 
 
 class ShopRoom(Room):
@@ -59,31 +64,68 @@ class ShopRoom(Room):
         super().__init__(position, offset, width, height, 'shop')
 
 
-def generate_rooms():
+def generate_rooms(num_rooms=8, room_type_weights=None):
+    if room_type_weights is None:
+        room_type_weights = {
+            MonsterRoom: 0.6,
+            TreasureRoom: 0.25,
+            ShopRoom: 0.15
+        }
+
+    min_rooms = 5
+    if num_rooms < min_rooms:
+        raise ValueError(f"num_rooms must be at least {min_rooms}")
+
     start_pos = (0, 0)
     directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
-    adjacent_positions = random.sample(directions, 2)
 
     room_positions = [start_pos]
+    while len(room_positions) < num_rooms:
+        base = random.choice(room_positions)
+        dx, dy = random.choice(directions)
+        new_pos = (base[0] + dx, base[1] + dy)
+        if new_pos not in room_positions:
+            room_positions.append(new_pos)
 
-    for direction in adjacent_positions:
-        pos = (start_pos[0] + direction[0], start_pos[1] + direction[1])
-        room_positions.append(pos)
+    distances = {start_pos: 0}
+    queue = deque([start_pos])
+    while queue:
+        current = queue.popleft()
+        for dx, dy in directions:
+            neighbor = (current[0] + dx, current[1] + dy)
+            if neighbor in room_positions and neighbor not in distances:
+                distances[neighbor] = distances[current] + 1
+                queue.append(neighbor)
 
-    distant_pos = (
-        start_pos[0] + adjacent_positions[0][0] * 2,
-        start_pos[1] + adjacent_positions[0][1] * 2
-    )
-    room_positions.append(distant_pos)
+    boss_pos = max(distances, key=distances.get)
 
-    room_classes = {start_pos: StartRoom, distant_pos: BossRoom}
+    MIN_SHOP_DISTANCE_FROM_START = 3
+    MIN_SHOP_DISTANCE_FROM_BOSS = 2
+
+    shop_candidates = [
+        pos for pos, d in distances.items()
+        if d >= MIN_SHOP_DISTANCE_FROM_START
+        and pos != boss_pos
+        and abs(pos[0] - boss_pos[0]) + abs(pos[1] - boss_pos[1]) >= MIN_SHOP_DISTANCE_FROM_BOSS
+    ]
+    if not shop_candidates:
+        shop_candidates = [pos for pos in room_positions if pos != start_pos and pos != boss_pos]
+
+    shop_pos = random.choice(shop_candidates)
+
+    room_classes = {
+        start_pos: StartRoom,
+        boss_pos: BossRoom,
+        shop_pos: ShopRoom
+    }
+
     remaining_positions = [pos for pos in room_positions if pos not in room_classes]
-    optional_classes = [TreasureRoom, ShopRoom, MonsterRoom]
-    random.shuffle(optional_classes)
+    weighted_types = list(room_type_weights.keys())
+    weights = list(room_type_weights.values())
 
     for pos in remaining_positions:
-        cls = optional_classes.pop() if optional_classes else MonsterRoom
-        room_classes[pos] = cls
+        room_type = random.choices(weighted_types, weights=weights, k=1)[0]
+        room_classes[pos] = room_type
 
     return room_positions, room_classes
 
@@ -119,6 +161,24 @@ def load_room(position, room_cls, all_sprites, collision_sprites, door_sprites, 
         room = room_cls(position, (offset_x, offset_y), room_width, room_height)
         rooms[position] = room
         create_doors(room, door_sprites)
+
+        if isinstance(room, MonsterRoom):
+            enemy = Cat(
+                (offset_x + room_width // 2, offset_y + room_height // 2),
+                (all_sprites,collision_sprites),
+                "Cat",
+                100,
+                [],
+                tier=0,
+                school=random.choice([School.MAGICAL, School.TECHNICAL])
+            )
+
+            enemy.new_game_starting_package()
+            enemy.rect.inflate_ip(-30, -40)
+
+            collision_sprites.add(enemy)
+            room.enemy = enemy
+            room.cleared = False
         print(f"Loaded {room.room_type} room at {position} (offset: {offset_x}, {offset_y})")
 
 
