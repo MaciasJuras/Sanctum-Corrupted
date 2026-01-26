@@ -3,11 +3,11 @@ import pygame
 
 from Code.Character.Character import Character, STARTING_MAX_MANA
 from Code.Cards.Card import *
+from Code.Character.enemy_ai import EnemyAI
 
 class Enemy(pygame.sprite.Sprite, Character):
-        #The Enemy class, inheriting all logic from Character and adding its own AI logic for choosing cards.
 
-    def __init__(self, pos, groups, name, health, full_deck: list[Card], tier, school: School = School.MAGICAL): #there are no NORMAL enemies
+    def __init__(self, pos, groups, name, health, full_deck: list[Card], tier, school: School = School.MAGICAL):
         pygame.sprite.Sprite.__init__(self, groups)
         Character.__init__(self, name, health, full_deck if full_deck else [])
 
@@ -19,11 +19,14 @@ class Enemy(pygame.sprite.Sprite, Character):
         self.mana = STARTING_MAX_MANA
         self.current_max_mana = STARTING_MAX_MANA
 
-        self.image = pygame.Surface((64, 64))  # Placeholder size
-        self.image.fill((100, 100, 100))  # Generic gray placeholder
+        self.image = pygame.Surface((64, 64))
+        self.image.fill((100, 100, 100))
 
         self.rect = self.image.get_frect(center=pos)
         self.position = pygame.math.Vector2(pos)
+
+        self.ai = EnemyAI()
+        self.ai.load_model()
 
     @abstractmethod
     def get_max_health(self, tier: int) -> int:
@@ -37,8 +40,13 @@ class Enemy(pygame.sprite.Sprite, Character):
     def get_name(self, tier: int) -> str:
         pass
 
-    def choose_card_to_play(self):
-        #AI logic will be implemented here. For now It's just random choice
+    def choose_card_to_play(self, player=None):
+        if player and hasattr(self, 'ai'):
+            action = self.ai.choose_action(self, player)
+            card = self.ai.get_card_from_action(action, self)
+            if card:
+                return card
+
         playable_cards = [card for card in self.hand if card.mana_cost <= self.mana]
         if not playable_cards:
             print(f"[{self.name}] has no playable cards and ends its turn.")
@@ -47,11 +55,10 @@ class Enemy(pygame.sprite.Sprite, Character):
         return chosen_card
 
     def end_battle(self, win):
-        """Enemy health resets since they're fresh each encounter."""
         self.current_max_mana = STARTING_MAX_MANA
         self.mana = 0
         self.turn_number = 0
-        self.health = self.max_health  # Enemies reset health
+        self.health = self.max_health
 
     def new_game_starting_package(self):
         match self.tier:
