@@ -273,7 +273,7 @@ def update_battle_sequence(player, enemy, display_surface):
     # --- PHASE: ENEMY CHOOSES CARD ---
     elif Battle_mode.battle_phase == Battle_mode.PHASE_ENEMY_CHOOSE:
         enemy_hand_positions = display_enemy_hand(enemy.hand, display_surface)
-        has_card = Battle_mode.prepare_enemy_card(enemy, enemy_hand_positions)
+        has_card = Battle_mode.prepare_enemy_card(enemy, player, enemy_hand_positions)
 
         if has_card:
             try:

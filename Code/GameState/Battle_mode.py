@@ -164,9 +164,8 @@ def apply_player_effect(player, enemy):
     return False  # Battle continues
 
 
-def prepare_enemy_card(enemy, enemy_hand_positions):
-    """Called when enemy needs to pick a card. Returns True if enemy played a card."""
-    enemy_card = enemy.choose_card_to_play()
+def prepare_enemy_card(enemy, player, enemy_hand_positions):
+    enemy_card = enemy.choose_card_to_play(player)
 
     if enemy_card:
         if enemy_card in enemy.hand:
@@ -182,8 +181,8 @@ def prepare_enemy_card(enemy, enemy_hand_positions):
         enemy.card_in_play = enemy_card
         enemy.card_in_play.position = pygame.Rect(start_x, start_y, TARGET_CARD_WIDTH, int(TARGET_CARD_WIDTH * 1.4))
 
-        return True  # Enemy played a card
-    return False  # Enemy passed turn (no playable cards)
+        return True
+    return False
 
 
 def apply_enemy_effect(player, enemy):
