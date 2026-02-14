@@ -20,6 +20,7 @@ def create_training_entities():
     pygame.display.set_mode((1, 1))
 
     player = Player((0, 0), [], [], 'Training Player', health=60, mana=50)
+    player.new_game_starting_package()
 
     enemy = Cat((0, 0), [], 'Training Cat', 100, [], tier=0, school=School.MAGICAL)
     enemy.new_game_starting_package()
@@ -82,7 +83,9 @@ def train_ai():
         enemy.new_game_starting_package()
         enemy.ai = ai
 
-        player.start_battle(enemy)
+        player.new_game_starting_package()
+
+        player.start_battle()
         enemy.start_battle()
 
         game_ended = False

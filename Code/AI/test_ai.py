@@ -21,8 +21,9 @@ def test_ai_integration():
     player = Player((0, 0), [], [], 'Test Player', health=60, mana=50)
     enemy = Cat((0, 0), [], 'Test Cat', 100, [], tier=0, school=School.MAGICAL)
     enemy.new_game_starting_package()
+    player.new_game_starting_package(enemy)
 
-    player.start_battle(enemy)
+    player.start_battle()
     enemy.start_battle()
     enemy.start_turn()
 
