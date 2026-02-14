@@ -77,7 +77,7 @@ def handle_card_selection(player, mouse_pressed_last_frame):
             if card.position and card.position.collidepoint(mouse_pos):
                 if player.mana < card.mana_cost:
                     print(f"Not enough Mana! Cost: {card.mana_cost}, Have: {player.mana}")
-                    break
+                    return mouse_pressed
 
                 print(f"Clicked on: {card.name}")
 

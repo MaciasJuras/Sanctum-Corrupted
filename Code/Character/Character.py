@@ -196,8 +196,10 @@ class Character(ABC):
             if random.random() < 0.2:  # 20% chance
                 self.dodge = 0  # Consume dodge when it triggers
                 self.dodge_triggered = True  # Flag for UI to show "Dodged!" text
-                print(f"[{self.name}] dodged the attack! (20% chance triggered)")
+                print(f"[{self.name}] DODGED! No damage taken.")
                 return  # Attack completely avoided
+            else:
+                print(f"[{self.name}] Dodge failed to trigger.")
 
         # Apply block (temporary shield)
         if self.block > 0:
@@ -212,12 +214,8 @@ class Character(ABC):
 
         # Apply remaining damage to health
         self.health -= damage
-        if self.health <= 0:
-            self.health = 0
-            print(f"[{self.name}] takes {damage} damage, 0 HP remaining.")
-            print(f"[{self.name}] has been defeated!")
-        else:
-            print(f"[{self.name}] takes {damage} damage, {self.health} HP remaining.")
+        self.health = max(0, self.health)  # Ensure health never goes below 0
+        print(f"[{self.name}] takes {damage} damage, {self.health} HP remaining.")
 
     def deal_damage_aoe(self, damage: int):
         """
