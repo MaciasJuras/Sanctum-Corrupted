@@ -46,10 +46,26 @@ class Character(ABC):
         card = create_card(get_random_card_ids(1)[0], tier, school_enum)
         self.full_deck.append(card)
 
-    def new_game_starting_package(self):
-        pass
-        # for _ in range(15):
-        #     self.get_new_card(0, 'NORMAL')
+    def new_game_starting_package(self, enemy=None):
+        school_enum = School['NORMAL']
+        for _ in range(2):
+            card = create_card(CID.STRIKE, 0, school_enum)
+            self.full_deck.append(card)
+            card = create_card(CID.SLASH, 0, school_enum)
+            self.full_deck.append(card)
+            card = create_card(CID.HEAVY_STRIKE, 0, school_enum)
+            self.full_deck.append(card)
+            card = create_card(CID.SHIELD_UP, 0, school_enum)
+            self.full_deck.append(card)
+            card = create_card(CID.DODGE, 0, school_enum)
+            self.full_deck.append(card)
+            card = create_card(CID.REGENERATION, 0, school_enum)
+            self.full_deck.append(card)
+            card = create_card(CID.HEAL, 0, school_enum)
+            self.full_deck.append(card)
+        card = create_card(CID.STRIKE, 0, school_enum)
+        self.full_deck.append(card)
+
 
     def start_battle(self):
         for card in self.full_deck:

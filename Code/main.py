@@ -122,8 +122,10 @@ if __name__ == "__main__":
                 # --- Battle Initialization ---
                 Battle_mode.reset_battle_state()
 
+                player.new_game_starting_package(enemy)
+
                 enemy.start_battle()
-                player.start_battle(enemy)
+                player.start_battle()
 
                 if Battle_mode.MULTI_CARD_MODE:
                     # Multi-card mode: use turn system

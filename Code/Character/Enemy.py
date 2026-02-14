@@ -60,20 +60,21 @@ class Enemy(pygame.sprite.Sprite, Character):
         self.turn_number = 0
         self.health = self.max_health
 
-    def new_game_starting_package(self):
-        match self.tier:
-            case 0:
-                for _ in range(15):
-                    self.get_new_card(0, self.school.name)
-            case 1:
-                for _ in range(15):
-                    self.get_new_card(0, self.school.name)
-                for _ in range(5):
-                    self.get_new_card(1, self.school.name)
-            case 2:
-                for _ in range(10):
-                    self.get_new_card(0, self.school.name)
-                for _ in range(5):
-                    self.get_new_card(1, self.school.name)
-                for _ in range(5):
-                    self.get_new_card(2, self.school.name)
+    #COMMENTED FOR TESTING
+    # def new_game_starting_package(self, enemy=None):
+    #     match self.tier:
+    #         case 0:
+    #             for _ in range(15):
+    #                 self.get_new_card(0, self.school.name)
+    #         case 1:
+    #             for _ in range(15):
+    #                 self.get_new_card(0, self.school.name)
+    #             for _ in range(5):
+    #                 self.get_new_card(1, self.school.name)
+    #         case 2:
+    #             for _ in range(10):
+    #                 self.get_new_card(0, self.school.name)
+    #             for _ in range(5):
+    #                 self.get_new_card(1, self.school.name)
+    #             for _ in range(5):
+    #                 self.get_new_card(2, self.school.name)
