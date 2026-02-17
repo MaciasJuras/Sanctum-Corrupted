@@ -135,7 +135,7 @@ def train_ai():
         print("Training neural network...")
         ai.model.fit(states, actions, epochs=20, batch_size=32, verbose=1)
 
-        model_path = project_root / "enemy_ai_model.h5"
+        model_path = project_root / "enemy_ai_model.keras"
         ai.save_model(str(model_path))
         print(f"Training completed! Model saved to {model_path}")
 

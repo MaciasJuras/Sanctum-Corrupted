@@ -18,7 +18,7 @@ class EnemyAI:
     def __init__(self, model_path: str = None):
         if model_path is None:
             project_root = Path(__file__).resolve().parent.parent.parent
-            self.model_path = str(project_root / "enemy_ai_model.h5")
+            self.model_path = str(project_root / "enemy_ai_model.keras")
         else:
             self.model_path = model_path
         self.model = None
@@ -117,16 +117,32 @@ class EnemyAI:
         if filepath is None:
             filepath = self.model_path
         if self.model:
+            if filepath.endswith('.h5'):
+                print("Saving model in legacy HDF5 (.h5) format as requested.")
             self.model.save(filepath)
             print(f"AI model saved to {filepath}")
 
     def load_model(self, filepath: str = None):
         if filepath is None:
             filepath = self.model_path
-        if os.path.exists(filepath):
-            self.model = keras.models.load_model(filepath)
-            print(f"AI model loaded from {filepath}")
-            return True
-        else:
-            print(f"No AI model found at {filepath}")
-            return False
+        tried = []
+        candidates = [filepath]
+        if filepath.endswith('.keras'):
+            candidates.append(filepath[:-6] + '.h5')
+        elif filepath.endswith('.h5'):
+            candidates.append(filepath[:-3] + '.keras')
+
+        for candidate in candidates:
+            if candidate in tried:
+                continue
+            tried.append(candidate)
+            if os.path.exists(candidate):
+                try:
+                    self.model = keras.models.load_model(candidate)
+                    print(f"AI model loaded from {candidate}")
+                    return True
+                except Exception as e:
+                    print(f"Failed to load model from {candidate}: {e}")
+
+        print(f"No AI model found at any of: {candidates}")
+        return False
