@@ -193,8 +193,8 @@ class Character(ABC):
         """
         # Check for dodge (20% chance to avoid if active)
         if self.dodge > 0:
+            self.dodge = 0
             if random.random() < 0.2:  # 20% chance
-                self.dodge = 0  # Consume dodge when it triggers
                 self.dodge_triggered = True  # Flag for UI to show "Dodged!" text
                 print(f"[{self.name}] DODGED! No damage taken.")
                 return  # Attack completely avoided
